@@ -1,0 +1,26 @@
+{
+  "name": "validator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "tsc": "tsc -b src/",
+    "tsc-watch": "tsc --b --watch src/",
+    "dev": "nodemon dist/app.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "author": "lesha2r",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^18.14.2",
+    "eslint": "^8.14.0",
+    "jest": "^29.7.0"
+  }
+}

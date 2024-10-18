@@ -76,7 +76,7 @@ const okObj1 = {
 }
 
 const okObjResult = testSchema1.validate(okObj1)
-console.log(okObjResult)
+// console.log(okObjResult)
 
 // const rulesSchema = new Schema({
 //     xMultiple: {
@@ -196,4 +196,24 @@ const deepTestObj = {
   }
 }
 
-console.log('deepObj', deepObjScheme.validate(deepTestObj).ok)
+// console.log('deepObj', deepObjScheme.validate(deepTestObj).ok)
+
+const ownStockSchema = new Schema({
+  supplierArticle: {
+    type: String,
+    required: true,
+  },
+  ownStockQty: {
+    type: Number,
+    required: true,
+  },
+});
+
+const body = {
+  "supplierArticle": "VisitBezh",
+  "ownStockQty1": 1000.1234
+}
+
+const validationResult = ownStockSchema.validate(body);
+
+console.log(validationResult)

@@ -98,8 +98,14 @@ const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey = key)
   // Check missing keys
   // @ts-ignore
   if (reqs.required === true && key in data === false || data === undefined) {
+    const errMsg = `Missing key '${deepKey}'`
+
     missedCheck.push(false)
-    results.errors.push(`Missing key '${deepKey}'`)
+    results.missed.push(deepKey)
+    results.failed.push(deepKey)
+    results.errors.push(errMsg) // TODO: error to helper\utils
+    results.byKeys[deepKey] = false
+    results.errorsByKeys[deepKey] = [errMsg]
     return results
   }
 

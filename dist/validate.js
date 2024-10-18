@@ -60,8 +60,13 @@ const handleReqKey = (key, data, reqs, deepKey = key) => {
         return results;
     }
     if (reqs.required === true && key in data === false || data === undefined) {
+        const errMsg = `Missing key '${deepKey}'`;
         missedCheck.push(false);
-        results.errors.push(`Missing key '${deepKey}'`);
+        results.missed.push(deepKey);
+        results.failed.push(deepKey);
+        results.errors.push(errMsg);
+        results.byKeys[deepKey] = false;
+        results.errorsByKeys[deepKey] = [errMsg];
         return results;
     }
     const typeCheck = checkType(key, data[key], reqs, deepKey);

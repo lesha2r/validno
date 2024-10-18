@@ -1,7 +1,7 @@
 import {describe, expect, test} from '@jest/globals';
 import { Schema } from '../dist/Schema.js';
 
-describe("Проверка каждого типа по отдельности", () => {
+describe('Проверка каждого типа по отдельности', () => {
     test('Тест String', () => {
         const key = 'testKey'
         const scheme = new Schema({

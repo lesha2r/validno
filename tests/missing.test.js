@@ -1,0 +1,129 @@
+import {describe, expect, test} from '@jest/globals';
+import { Schema } from '../dist/Schema.js';
+
+const getMissingError = (key) => `Missing key '${key}'`
+
+describe('Тестирование обработки пропущенных свойста', () => {
+    test('Отсутствующий ключ правильно отображается в результате', () => {
+        const missedKey = 'testKey'
+        const missedKey2 = 'testKey2'
+
+        const okKey = 'okKey'
+
+        const scheme = new Schema({
+            [missedKey]: {
+                required: true,
+                type: String
+            },
+            [missedKey2]: {
+                required: true,
+                type: String
+            },
+            [okKey]: {
+                required: true,
+                type: String
+            }
+        })
+
+        const obj = {
+            [okKey]: 'string'
+        }
+
+        const result = scheme.validate(obj)
+
+        expect(result).toEqual({
+            ok: false,
+            failed: [missedKey, missedKey2],
+            missed: [missedKey, missedKey2],
+            errors: [getMissingError(missedKey), getMissingError(missedKey2)],
+            passed: [okKey],
+            byKeys: {
+                [missedKey]: false,
+                [missedKey2]: false,
+                [okKey]: true
+            },
+            errorsByKeys: {
+                [okKey]: [],
+                [missedKey]: [getMissingError(missedKey)],
+                [missedKey2]: [getMissingError(missedKey2)]
+            }
+        })
+    })
+
+    test('Присутствующий ключ правильно отображается в результате', () => {
+        const key = 'testKey'
+        const key2 = 'testKey2'
+
+        const scheme = new Schema({
+            [key]: {
+                required: true,
+                type: String
+            },
+            [key2]: {
+                required: true,
+                type: String
+            }
+        })
+
+        const obj = {
+            [key]: 'string',
+            [key2]: 'string'
+        }
+
+        const result = scheme.validate(obj)
+        
+        expect(result).toEqual({
+            ok: true,
+            failed: [],
+            missed: [],
+            errors: [],
+            passed: [key, key2],
+            byKeys: {
+                [key]: true,
+                [key2]: true
+            },
+            errorsByKeys: {
+                [key]: [],
+                [key2]: []
+            }
+        })
+    })
+
+    test('Отсутствующий необязательный ключ правильно отображается в результах', () => {
+        const key = 'testKey'
+        const key2 = 'testKey2'
+
+        const scheme = new Schema({
+            [key]: {
+                required: false,
+                type: String
+            },
+            [key2]: {
+                required: true,
+                type: String
+            }
+        })
+
+        const obj = {
+            [key2]: 'string'
+        }
+
+        const result = scheme.validate(obj)
+        
+        expect(result).toEqual({
+            ok: true,
+            failed: [],
+            missed: [],
+            errors: [],
+            passed: [key, key2],
+            byKeys: {
+                [key]: true,
+                [key2]: true
+            },
+            errorsByKeys: {
+                [key]: [],
+                [key2]: []
+            }
+        })
+    })
+})

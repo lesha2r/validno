@@ -1,6 +1,7 @@
 import checkRules from "./checkRules.js";
 import checkType from "./checkType.js";
 import { defaultSchemaKeys, Schema, TSchemaInput } from "./Schema.js";
+import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
 
 type TResult = {
@@ -98,12 +99,12 @@ const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey = key)
   // Check missing keys
   // @ts-ignore
   if (reqs.required === true && key in data === false || data === undefined) {
-    const errMsg = `Missing key '${deepKey}'`
+    const errMsg = _errors.getMissingError(deepKey)
 
     missedCheck.push(false)
     results.missed.push(deepKey)
     results.failed.push(deepKey)
-    results.errors.push(errMsg) // TODO: error to helper\utils
+    results.errors.push(errMsg)
     results.byKeys[deepKey] = false
     results.errorsByKeys[deepKey] = [errMsg]
     return results

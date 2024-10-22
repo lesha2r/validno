@@ -1,7 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
 import { Schema } from '../dist/Schema.js';
-
-const getMissingError = (key) => `Missing key '${key}'`
+import _errors from '../dist/utils/errors.js';
 
 describe('Тестирование обработки пропущенных свойста', () => {
     test('Отсутствующий ключ правильно отображается в результате', () => {
@@ -35,7 +34,10 @@ describe('Тестирование обработки пропущенных с�
             ok: false,
             failed: [missedKey, missedKey2],
             missed: [missedKey, missedKey2],
-            errors: [getMissingError(missedKey), getMissingError(missedKey2)],
+            errors: [
+                _errors.getMissingError(missedKey),
+                _errors.getMissingError(missedKey2)
+            ],
             passed: [okKey],
             byKeys: {
                 [missedKey]: false,
@@ -44,8 +46,8 @@ describe('Тестирование обработки пропущенных с�
             },
             errorsByKeys: {
                 [okKey]: [],
-                [missedKey]: [getMissingError(missedKey)],
-                [missedKey2]: [getMissingError(missedKey2)]
+                [missedKey]: [_errors.getMissingError(missedKey)],
+                [missedKey2]: [_errors.getMissingError(missedKey2)]
             }
         })
     })

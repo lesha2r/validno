@@ -1,6 +1,7 @@
 import checkRules from "./checkRules.js";
 import checkType from "./checkType.js";
 import { defaultSchemaKeys } from "./Schema.js";
+import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
 const getResultDefaults = () => {
     return {
@@ -60,7 +61,7 @@ const handleReqKey = (key, data, reqs, deepKey = key) => {
         return results;
     }
     if (reqs.required === true && key in data === false || data === undefined) {
-        const errMsg = `Missing key '${deepKey}'`;
+        const errMsg = _errors.getMissingError(deepKey);
         missedCheck.push(false);
         results.missed.push(deepKey);
         results.failed.push(deepKey);

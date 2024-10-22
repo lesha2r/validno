@@ -3,6 +3,8 @@ import _validations from "./utils/validations.js"
 
 export type TRule = {[key: string]: any}
 
+type TLengths = string | Array<any>
+
 const rulesFunctions: any = {
     custom: (key: string, val: any, func: Function) => {
         return func(val)
@@ -25,38 +27,38 @@ const rulesFunctions: any = {
             details: `Значение не должно быть "${notEqualTo}"`
         }
     },
-    min: (key: string, val: any, min: number) => {
+    min: (key: string, val: number, min: number) => {
         return {
             result: _validations.isNumberGte(val, min),
             details: "Значение не может быть меньше " + min
         }
     },
-    max: (key: string, val: any, max: number) => {
+    max: (key: string, val: number, max: number) => {
         return {
             result: _validations.isNumberLte(val, max),
             details: "Значение не может быть больше " + max
         }
     },
-    minMax: (key: string, val: any, minMax: [min: number, max: number]) => {
+    minMax: (key: string, val: number, minMax: [min: number, max: number]) => {
         const [min, max] = minMax
         return {
             result: _validations.isNumberGte(val, min) && _validations.isNumberLte(val, max),
             details: `Значение должно быть в пределах ${min}-${max}`
         }
     },
-    length: (key: string, val: any, length: number) => {
+    length: (key: string, val: TLengths, length: number) => {
         return {
             result: _validations.lengthIs(val, length),
             details: "Количество символов должно быть равным " + length
         }
     },
-    lengthNot: (key: string, val: any, lengthNot: number) => {
+    lengthNot: (key: string, val:  TLengths, lengthNot: number) => {
         return {
             result: _validations.lengthNot(val, lengthNot),
             details: "Количество символов не должно быть равным " + lengthNot
         }
     },
-    lengthMinMax: (key: string, val: any, minMax: [min: number, max: number]) => {
+    lengthMinMax: (key: string, val:  TLengths, minMax: [min: number, max: number]) => {
         const [min, max] = minMax
 
         return {
@@ -64,13 +66,13 @@ const rulesFunctions: any = {
             details: `Длина должна быть от ${min} до ${max} символов`
         }
     },
-    lengthMin: (key: string, val: any, min: number) => {
+    lengthMin: (key: string, val:  TLengths, min: number) => {
         return {
             result: _validations.lengthMin(val, min),
             details: `Длина не может быть меньше ${min} символов`
         }
     },
-    lengthMax: (key: string, val: any, max: number) => {
+    lengthMax: (key: string, val:  TLengths, max: number) => {
         return {
             result: _validations.lengthMax(val, max),
             details: `Длина не может быть больше ${max} символов`

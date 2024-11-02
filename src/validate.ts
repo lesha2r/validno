@@ -154,14 +154,21 @@ export const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey
   return results
 }
 
-const validate = (schema: Schema, data: any): TResult => {
-    let results: TResult = getResultDefaults()
-  
-    for (const [key, reqs] of Object.entries(schema.schema)) {
-      // @ts-ignore
-      const keyResult = handleReqKey(key, data, reqs)
+const isCheckNeeded = (key: string, hasLimits: boolean, onlyKeys?: string | string[]) => {
+  return !hasLimits || (key === onlyKeys || Array.isArray(onlyKeys) && onlyKeys?.includes(key))
+}
 
-      results = mergeResults(results, keyResult)
+const validate = (schema: Schema, data: any, onlyKeys?: string | string[]): TResult => {
+    let results: TResult = getResultDefaults()
+    const areKeysLimited = (Array.isArray(onlyKeys) && onlyKeys.length > 0) || (typeof onlyKeys === 'string' && onlyKeys.length > 0)
+
+    for (const [key, reqs] of Object.entries(schema.schema)) {
+      if (isCheckNeeded(key, areKeysLimited, onlyKeys)) {
+        // @ts-ignore
+        const keyResult = handleReqKey(key, data, reqs)
+
+        results = mergeResults(results, keyResult)
+      }
     }
   
     if (results.failed.length) results.ok = false

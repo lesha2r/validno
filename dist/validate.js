@@ -101,11 +101,17 @@ export const handleReqKey = (key, data, reqs, deepKey = key) => {
     results.byKeys[deepKey] = (missedCheck.length + typeChecked.length + rulesChecked.length) === 0;
     return results;
 };
-const validate = (schema, data) => {
+const isCheckNeeded = (key, hasLimits, onlyKeys) => {
+    return !hasLimits || (key === onlyKeys || Array.isArray(onlyKeys) && (onlyKeys === null || onlyKeys === void 0 ? void 0 : onlyKeys.includes(key)));
+};
+const validate = (schema, data, onlyKeys) => {
     let results = getResultDefaults();
+    const areKeysLimited = (Array.isArray(onlyKeys) && onlyKeys.length > 0) || (typeof onlyKeys === 'string' && onlyKeys.length > 0);
     for (const [key, reqs] of Object.entries(schema.schema)) {
-        const keyResult = handleReqKey(key, data, reqs);
-        results = mergeResults(results, keyResult);
+        if (isCheckNeeded(key, areKeysLimited, onlyKeys)) {
+            const keyResult = handleReqKey(key, data, reqs);
+            results = mergeResults(results, keyResult);
+        }
     }
     if (results.failed.length)
         results.ok = false;

@@ -1,5 +1,4 @@
 import validate from "./validate.js"
-import validateKey from "./validateKey.js"
 
 export type TSchemaItem = {
     required: boolean,
@@ -35,11 +34,7 @@ export class Schema {
         this.schema = inputSchema
     }
 
-    validate(data: any) {
-        return validate.call(this, this, data)
-    }
-
-    validateKey(key: string, data: any) {
-        return validateKey.call(this, this, data, key)
+    validate(data: any, keys?: string | string[]) {
+        return validate.call(this, this, data, keys)
     }
 }

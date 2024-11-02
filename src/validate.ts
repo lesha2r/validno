@@ -4,7 +4,7 @@ import { defaultSchemaKeys, Schema, TSchemaInput } from "./Schema.js";
 import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
 
-type TResult = {
+export type TResult = {
     ok: null | boolean,
     missed: string[],
     failed: string[],
@@ -14,7 +14,7 @@ type TResult = {
     errorsByKeys: {[key: string]: string[]}
 };
 
-const getResultDefaults = (): TResult => {
+export const getResultDefaults = (): TResult => {
   return {
     ok: null,
     missed: [],
@@ -38,7 +38,7 @@ const checkIsNested = (obj: {[key: string]: any}) => {
   }
 }
 
-const mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
+export const mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
   const output = getResultDefaults()
 
   output.failed = [...resultsOld.failed, ...resultsNew.failed]
@@ -51,7 +51,7 @@ const mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
   return output
 }
 
-const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey = key) => {
+export const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey = key) => {
   let results = getResultDefaults()
   const hasNested = checkIsNested(reqs)
   

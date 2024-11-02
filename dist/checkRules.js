@@ -1,4 +1,16 @@
 import _validations from "./utils/validations.js";
+export const rulesParams = {
+    lengthMin: {
+        allowedTypes: [String]
+    }
+};
+const ensureRuleHasCorrectType = (value, allowedTypes) => {
+    const isInAllowedList = allowedTypes.some(TYPE => {
+        const getType = (el) => Object.prototype.toString.call(el);
+        return getType(new TYPE()) == getType(value);
+    });
+    return isInAllowedList;
+};
 const rulesFunctions = {
     custom: (key, val, func) => {
         return func(val);
@@ -60,6 +72,7 @@ const rulesFunctions = {
         };
     },
     lengthMin: (key, val, min) => {
+        ensureRuleHasCorrectType(val, rulesParams['lengthMin'].allowedTypes);
         return {
             result: _validations.lengthMin(val, min),
             details: `Длина не может быть меньше ${min} символов`

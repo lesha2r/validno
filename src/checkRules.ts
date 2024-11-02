@@ -5,6 +5,21 @@ export type TRule = {[key: string]: any}
 
 type TLengths = string | Array<any>
 
+export const rulesParams = {
+    lengthMin: {
+        allowedTypes: [String]
+    }
+}
+
+const ensureRuleHasCorrectType = (value: any, allowedTypes: any[]) => {
+    const isInAllowedList = allowedTypes.some(TYPE => {
+        const getType = (el: any) => Object.prototype.toString.call(el)
+        return getType(new TYPE()) == getType(value)
+    })
+
+    return isInAllowedList
+}
+
 const rulesFunctions: any = {
     custom: (key: string, val: any, func: Function) => {
         return func(val)
@@ -67,6 +82,8 @@ const rulesFunctions: any = {
         }
     },
     lengthMin: (key: string, val:  TLengths, min: number) => {
+        ensureRuleHasCorrectType(val, rulesParams['lengthMin'].allowedTypes)
+
         return {
             result: _validations.lengthMin(val, min),
             details: `Длина не может быть меньше ${min} символов`
@@ -137,6 +154,7 @@ const checkRules = (key: string, value: any, requirements: TSchemaItem) => {
   
     // If key has failed rules checks
     const failedResults = allResults.filter(el => el.result === false)
+    
     if (failedResults.length) {
         result.ok = false
         result.details = failedResults.map(el => el.details)

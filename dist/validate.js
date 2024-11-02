@@ -3,7 +3,7 @@ import checkType from "./checkType.js";
 import { defaultSchemaKeys } from "./Schema.js";
 import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
-const getResultDefaults = () => {
+export const getResultDefaults = () => {
     return {
         ok: null,
         missed: [],
@@ -25,7 +25,7 @@ const checkIsNested = (obj) => {
         return true;
     }
 };
-const mergeResults = (resultsOld, resultsNew) => {
+export const mergeResults = (resultsOld, resultsNew) => {
     const output = getResultDefaults();
     output.failed = [...resultsOld.failed, ...resultsNew.failed];
     output.errors = [...resultsOld.errors, ...resultsNew.errors];
@@ -35,7 +35,7 @@ const mergeResults = (resultsOld, resultsNew) => {
     output.errorsByKeys = Object.assign(Object.assign({}, resultsOld.errorsByKeys), resultsNew.errorsByKeys);
     return output;
 };
-const handleReqKey = (key, data, reqs, deepKey = key) => {
+export const handleReqKey = (key, data, reqs, deepKey = key) => {
     let results = getResultDefaults();
     const hasNested = checkIsNested(reqs);
     const missedCheck = [];

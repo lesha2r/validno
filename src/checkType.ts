@@ -18,6 +18,7 @@ const getErrorDetails = (key: string, expectedType: any, receivedValue: any) => 
 
 const checkTypeMultiple = (key: string, value: any, requirements: TSchemaItem | TSchemaInput, keyName = key) => {
   const constructorNames = requirements.type.map((el:any) => String(el?.name || el))
+  
   const result = {
     key: keyName,
     passed: false,
@@ -44,6 +45,8 @@ const checkTypeMultiple = (key: string, value: any, requirements: TSchemaItem | 
 type TCheckTypeResult = {key: string, passed: boolean, details: string}
 
 const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaInput, keyName = key): TCheckTypeResult[] => {
+    const isNotNull = value !== null
+    
     if (value === undefined && requirements.required) {
       return [{key: keyName, passed: false, details: `Key ${keyName} is missing`}]
     }
@@ -72,7 +75,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         })
         break;
       case Number:
-        const isNumber = _validations.isNumber(value)
+        const isNumber = isNotNull && value.constructor === Number 
+
         result.push({
           key: keyName,
           passed: isNumber,
@@ -81,7 +85,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
 
         break;
       case String:
-        const isString = _validations.isString(value);
+        const isString = isNotNull && value.constructor === String
+
         result.push({
           key: keyName,
           passed: isString,
@@ -89,7 +94,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         })
         break;
       case Date:
-        const isDate = _validations.isDate(value)
+        const isDate = isNotNull && value.constructor === Date
+
         result.push({
           key: keyName,
           passed: isDate,
@@ -97,7 +103,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         })
         break;
       case Boolean:
-        const isBoolean = _validations.isBoolean(value);
+        const isBoolean = isNotNull && value.constructor === Boolean
+
         result.push({
           key: keyName,
           passed: isBoolean,
@@ -105,7 +112,17 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         })
         break;
       case Array:
-        const isArray = _validations.isArray(value);
+        const isArray = isNotNull && value.constructor === Array
+
+        if (!isArray) {
+          result.push({
+              key: keyName,
+              passed: false,
+              details: getErrorDetails(keyName, requirements.type, value)
+          });
+          
+          break;
+      }
 
         let isEachChecked = { passed: true, details: ""}
         
@@ -132,7 +149,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
 
         break;
       case Object:
-        const isObject = _validations.isObject(value)
+        const isObject = _validations.isObject(value) && value.constructor === Object
         result.push({
           key: keyName,
           passed: isObject,
@@ -150,7 +167,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
 
         break;
       case null:
-        const isNull = _validations.isNull(value);
+        const isNull = value === null
+
         result.push({
           key: keyName,
           passed: isNull,
@@ -162,7 +180,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: false,
-          details: `No type specified for key: '${keyName}'`
+          details: `Тип '${keyName}' не определен`
         })
     }
   

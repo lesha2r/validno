@@ -280,6 +280,10 @@ describe("Проверка всех типов сразу", () => {
             },
             date: {
                 type: Date
+            },
+            test: {
+                type: Object,
+                required: true
             }
         })
 
@@ -290,7 +294,8 @@ describe("Проверка всех типов сразу", () => {
             arr: null,
             null: {},
             bool: new Date(),
-            date: true
+            date: true,
+            test: undefined
         }
 
         const res = schema.validate(obj)

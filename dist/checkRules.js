@@ -30,7 +30,7 @@ const rulesFunctions = {
     isNot: (key, val, notEqualTo) => {
         return {
             result: _validations.isNot(val, notEqualTo),
-            details: `Значение не должно быть "${notEqualTo}"`
+            details: `Значение "${notEqualTo}" недопустимо`
         };
     },
     min: (key, val, min) => {
@@ -93,7 +93,7 @@ const rulesFunctions = {
     enum: (key, value, allowedList) => {
         return {
             result: allowedList.includes(value),
-            details: `Значение "${value}" не допустимо`
+            details: `Значение "${value}" недопустимо`
         };
     }
 };
@@ -104,17 +104,15 @@ const checkRules = (key, value, requirements) => {
     };
     if (requirements.required !== true && value === undefined)
         return result;
-    if ('rules' in requirements === false)
-        return result;
     if (!requirements || !requirements.rules || !Object.keys(requirements.rules).length) {
         return result;
     }
     const rules = requirements.rules;
     const allResults = [];
-    const allRules = Object.keys(rules);
+    const allRulesKeys = Object.keys(rules);
     let i = 0;
-    while (i < allRules.length) {
-        const ruleName = allRules[i];
+    while (i < allRulesKeys.length) {
+        const ruleName = allRulesKeys[i];
         if (ruleName in rulesFunctions === false) {
             i++;
             continue;

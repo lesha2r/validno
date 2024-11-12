@@ -39,7 +39,7 @@ const rulesFunctions: any = {
     isNot: (key: string, val: any, notEqualTo: any) => {
         return {
             result: _validations.isNot(val, notEqualTo),
-            details: `Значение не должно быть "${notEqualTo}"`
+            details: `Значение "${notEqualTo}" недопустимо`
         }
     },
     min: (key: string, val: number, min: number) => {
@@ -104,7 +104,7 @@ const rulesFunctions: any = {
     enum: (key: string, value: any, allowedList: any[]) => {
         return {
             result: allowedList.includes(value),
-            details: `Значение "${value}" не допустимо`
+            details: `Значение "${value}" недопустимо`
         }
     }
 };
@@ -120,11 +120,10 @@ const checkRules = (key: string, value: any, requirements: TSchemaItem) => {
         details: []
     };
 
-    // If value is not provided AND not required by schema
+    // Значение отсутствует, но НЕ является обязательным
     if (requirements.required !== true && value === undefined) return result
 
-    // No rules specified for the key
-    if ('rules' in requirements === false) return result
+    // Для этого ключа нет правил
     if (!requirements || !requirements.rules || !Object.keys(requirements.rules).length) {
         return result
     }
@@ -132,12 +131,13 @@ const checkRules = (key: string, value: any, requirements: TSchemaItem) => {
     const rules: TRule = requirements.rules
 
     const allResults = []
-    const allRules = Object.keys(rules)
+    const allRulesKeys = Object.keys(rules)
     
     let i = 0;
-    while (i < allRules.length) {
-        const ruleName = allRules[i]
+    while (i < allRulesKeys.length) {
+        const ruleName = allRulesKeys[i]
 
+        // Если правило, указанное для ключа, отсутствует в списке доступных
         if (ruleName in rulesFunctions === false) {
             i++
             continue

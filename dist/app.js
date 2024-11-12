@@ -4,6 +4,18 @@ const schema = new Schema({
         type: String,
         required: true,
     },
+    date: {
+        type: Date,
+        required: true,
+    },
+    obj: {
+        type: Object,
+        required: true,
+    },
+    bool: {
+        type: Boolean,
+        required: true,
+    },
     val2: {
         type: Number,
         required: true,
@@ -11,19 +23,23 @@ const schema = new Schema({
             min: 3
         }
     },
-    val3: {
-        type: String,
+    srtOrNum: {
+        type: [String, Number],
+        required: true,
+    },
+    nl: {
+        type: null,
         required: true,
     },
 });
 const testObj = {
     val: 'string',
-    val2: 1,
-    val3: 'ss'
+    val2: 4,
+    obj: {},
+    srtOrNum: ['ss'],
+    date: new Date(),
+    bool: true,
+    nl: null
 };
 const resAll = schema.validate(testObj);
-const res = schema.validate(testObj, ['val', 'val2']);
-const res2 = schema.validate(testObj, 'val2');
-console.log(resAll);
-console.log(res);
-console.log(res2);
+const str = 'test';

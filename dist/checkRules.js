@@ -12,8 +12,8 @@ const ensureRuleHasCorrectType = (value, allowedTypes) => {
     return isInAllowedList;
 };
 const rulesFunctions = {
-    custom: (key, val, func) => {
-        return func(val);
+    custom: (key, val, func, extra) => {
+        return func(val, extra);
     },
     isEmail: (key, val) => {
         return {
@@ -91,13 +91,26 @@ const rulesFunctions = {
         };
     },
     enum: (key, value, allowedList) => {
-        return {
-            result: allowedList.includes(value),
-            details: `Значение "${value}" недопустимо`
+        const output = {
+            result: true,
+            details: ''
         };
+        if (!Array.isArray(value)) {
+            const isCorrect = allowedList.includes(value);
+            output.result = isCorrect,
+                output.details = isCorrect ? '' : `Значение "${value}" недопустимо`;
+        }
+        else {
+            const incorrectValues = [];
+            value.forEach((v) => !allowedList.includes(v) ? incorrectValues.push(v) : {});
+            const isCorrect = incorrectValues.length === 0;
+            output.result = isCorrect,
+                output.details = isCorrect ? '' : `Значения недопустимы: "${incorrectValues.join(', ')}"`;
+        }
+        return output;
     }
 };
-const checkRules = (key, value, requirements) => {
+function checkRules(key, value, requirements, inputObj) {
     const result = {
         ok: true,
         details: []
@@ -119,7 +132,7 @@ const checkRules = (key, value, requirements) => {
         }
         const func = rulesFunctions[ruleName];
         const args = rules[ruleName];
-        const result = func(key, value, args);
+        const result = func(key, value, args, { schema: this.schema, input: inputObj });
         allResults.push(result);
         i++;
     }
@@ -129,5 +142,6 @@ const checkRules = (key, value, requirements) => {
         result.details = failedResults.map(el => el.details);
     }
     return result;
-};
+}
+;
 export default checkRules;

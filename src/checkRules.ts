@@ -1,4 +1,4 @@
-import { TSchemaItem } from "./Schema.js";
+import { TSchema, TSchemaItem } from "./Schema.js";
 import _validations from "./utils/validations.js"
 
 export type TRule = {[key: string]: any}
@@ -21,8 +21,8 @@ const ensureRuleHasCorrectType = (value: any, allowedTypes: any[]) => {
 }
 
 const rulesFunctions: any = {
-    custom: (key: string, val: any, func: Function) => {
-        return func(val)
+    custom: (key: string, val: any, func: Function, extra: {schema: TSchema, input: {[key: string]: any}}) => {
+        return func(val, extra)
     },
     isEmail: (key: string, val: any) => {
         return {
@@ -102,10 +102,25 @@ const rulesFunctions: any = {
         }
     },
     enum: (key: string, value: any, allowedList: any[]) => {
-        return {
-            result: allowedList.includes(value),
-            details: `Значение "${value}" недопустимо`
+        const output = {
+            result: true,
+            details: ''
         }
+
+        if (!Array.isArray(value)) {
+            const isCorrect = allowedList.includes(value)
+            output.result = isCorrect,
+            output.details = isCorrect ? '' : `Значение "${value}" недопустимо`
+        } else {
+            const incorrectValues: any[] = []
+            value.forEach((v: any) => !allowedList.includes(v) ? incorrectValues.push(v): {})
+            const isCorrect = incorrectValues.length === 0
+
+            output.result = isCorrect,
+            output.details = isCorrect ? '' : `Значения недопустимы: "${incorrectValues.join(', ')}"`
+        }
+
+        return output
     }
 };
 
@@ -114,7 +129,7 @@ type TRulesResult = {
     details: string[]
 } 
 
-const checkRules = (key: string, value: any, requirements: TSchemaItem) => {
+function checkRules (this: any, key: string, value: any, requirements: TSchemaItem, inputObj: any) {
     const result: TRulesResult = {
         ok: true,
         details: []
@@ -146,7 +161,7 @@ const checkRules = (key: string, value: any, requirements: TSchemaItem) => {
         const func = rulesFunctions[ruleName]
         const args = rules[ruleName]
 
-        const result = func(key, value, args)
+        const result = func(key, value, args, {schema: this.schema, input: inputObj})
         allResults.push(result)
 
         i++;

@@ -51,10 +51,10 @@ export const mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
   return output
 }
 
-export const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey = key) => {
+export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInput, deepKey = key) {
   let results = getResultDefaults()
   const hasNested = checkIsNested(reqs)
-  
+
   const missedCheck: boolean[] = [];
   const typeChecked: boolean[] = [];
   const rulesChecked: boolean[] = [];
@@ -80,7 +80,8 @@ export const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey
     while (i < nestedReqKeys.length) {
       const reqKeyI: string = nestedReqKeys[i]
 
-      const deepResults = handleReqKey(
+      const deepResults = handleReqKey.call(
+        this,
         reqKeyI,
         data[key],
         // @ts-ignore
@@ -122,7 +123,7 @@ export const handleReqKey = (key: string, data: any, reqs: TSchemaInput, deepKey
 
   // Check all rules
   // @ts-ignore
-  const ruleCheck = checkRules(deepKey, data[key], reqs);
+  const ruleCheck = checkRules.call(this, deepKey, data[key], reqs, data);
 
   if (!ruleCheck.ok) {
     rulesChecked.push(false)
@@ -158,14 +159,14 @@ const isCheckNeeded = (key: string, hasLimits: boolean, onlyKeys?: string | stri
   return !hasLimits || (key === onlyKeys || Array.isArray(onlyKeys) && onlyKeys?.includes(key))
 }
 
-const validate = (schema: Schema, data: any, onlyKeys?: string | string[]): TResult => {
+function validate(schema: Schema, data: any, onlyKeys?: string | string[]): TResult {
     let results: TResult = getResultDefaults()
     const areKeysLimited = (Array.isArray(onlyKeys) && onlyKeys.length > 0) || (typeof onlyKeys === 'string' && onlyKeys.length > 0)
 
     for (const [key, reqs] of Object.entries(schema.schema)) {
       if (isCheckNeeded(key, areKeysLimited, onlyKeys)) {
         // @ts-ignore
-        const keyResult = handleReqKey(key, data, reqs)
+        const keyResult = handleReqKey.call(this, key, data, reqs)
 
         results = mergeResults(results, keyResult)
       }

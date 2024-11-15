@@ -35,7 +35,7 @@ export const mergeResults = (resultsOld, resultsNew) => {
     output.errorsByKeys = Object.assign(Object.assign({}, resultsOld.errorsByKeys), resultsNew.errorsByKeys);
     return output;
 };
-export const handleReqKey = (key, data, reqs, deepKey = key) => {
+export function handleReqKey(key, data, reqs, deepKey = key) {
     let results = getResultDefaults();
     const hasNested = checkIsNested(reqs);
     const missedCheck = [];
@@ -54,7 +54,7 @@ export const handleReqKey = (key, data, reqs, deepKey = key) => {
         let i = 0;
         while (i < nestedReqKeys.length) {
             const reqKeyI = nestedReqKeys[i];
-            const deepResults = handleReqKey(reqKeyI, data[key], reqs[reqKeyI], deepKey + '.' + reqKeyI);
+            const deepResults = handleReqKey.call(this, reqKeyI, data[key], reqs[reqKeyI], deepKey + '.' + reqKeyI);
             results = mergeResults(results, deepResults);
             i++;
         }
@@ -77,7 +77,7 @@ export const handleReqKey = (key, data, reqs, deepKey = key) => {
             results.errors.push(res.details);
         }
     });
-    const ruleCheck = checkRules(deepKey, data[key], reqs);
+    const ruleCheck = checkRules.call(this, deepKey, data[key], reqs, data);
     if (!ruleCheck.ok) {
         rulesChecked.push(false);
         ruleCheck.details.forEach((el) => {
@@ -100,16 +100,16 @@ export const handleReqKey = (key, data, reqs, deepKey = key) => {
     ];
     results.byKeys[deepKey] = (missedCheck.length + typeChecked.length + rulesChecked.length) === 0;
     return results;
-};
+}
 const isCheckNeeded = (key, hasLimits, onlyKeys) => {
     return !hasLimits || (key === onlyKeys || Array.isArray(onlyKeys) && (onlyKeys === null || onlyKeys === void 0 ? void 0 : onlyKeys.includes(key)));
 };
-const validate = (schema, data, onlyKeys) => {
+function validate(schema, data, onlyKeys) {
     let results = getResultDefaults();
     const areKeysLimited = (Array.isArray(onlyKeys) && onlyKeys.length > 0) || (typeof onlyKeys === 'string' && onlyKeys.length > 0);
     for (const [key, reqs] of Object.entries(schema.schema)) {
         if (isCheckNeeded(key, areKeysLimited, onlyKeys)) {
-            const keyResult = handleReqKey(key, data, reqs);
+            const keyResult = handleReqKey.call(this, key, data, reqs);
             results = mergeResults(results, keyResult);
         }
     }
@@ -118,5 +118,6 @@ const validate = (schema, data, onlyKeys) => {
     else
         results.ok = true;
     return results;
-};
+}
+;
 export default validate;

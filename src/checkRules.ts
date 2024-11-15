@@ -77,7 +77,7 @@ const rulesFunctions: any = {
         const [min, max] = minMax
 
         return {
-            result: _validations.lengthMin(val, min) && _validations.lengthMin(val, max),
+            result: _validations.lengthMin(val, min) && _validations.lengthMax(val, max),
             details: `Длина должна быть от ${min} до ${max} символов`
         }
     },

@@ -82,10 +82,12 @@ const checkType = (key, value, requirements, keyName = key) => {
             break;
         case Date:
             const isDate = isNotNull && value.constructor === Date;
+            const isValid = isDate && !isNaN(value.getTime());
+            const errorMsg = isValid ? getErrorDetails(keyName, requirements.type, value) : 'Дата невалидна';
             result.push({
                 key: keyName,
-                passed: isDate,
-                details: isDate ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                passed: isDate && isValid,
+                details: isDate && isValid ? 'Passed' : errorMsg
             });
             break;
         case Boolean:

@@ -5,6 +5,8 @@ export type TSchemaItem = {
     type: any,
     eachType?: any,
     rules?: {},
+    title?: string,
+    customMessage?: Function
 }
 
 export type TSchemaInput = {
@@ -15,14 +17,18 @@ export const enum ESchemaFields {
     Required = 'required',
     Type = 'type',
     EachType = 'eachType',
-    Rules = 'rules'
+    Rules = 'rules',
+    Title = 'title',
+    CustomMessage = 'customMessage'
 }
 
 export const defaultSchemaKeys = [
     ESchemaFields.Required,
     ESchemaFields.Type,
     ESchemaFields.EachType,
-    ESchemaFields.Rules
+    ESchemaFields.Rules,
+    ESchemaFields.Title,
+    ESchemaFields.CustomMessage
 ]
 
 export type TSchema = TSchemaInput

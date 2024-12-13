@@ -1,8 +1,8 @@
 import checkRules from "./checkRules.js";
 import checkType from "./checkType.js";
-import { defaultSchemaKeys } from "./Schema.js";
 import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
+import { defaultSchemaKeys } from "./Schema.js";
 export const getResultDefaults = () => {
     return {
         ok: null,
@@ -11,7 +11,9 @@ export const getResultDefaults = () => {
         passed: [],
         errors: [],
         byKeys: {},
-        errorsByKeys: {}
+        byTitles: {},
+        errorsByKeys: {},
+        errorsByTitles: {}
     };
 };
 const checkIsNested = (obj) => {
@@ -32,12 +34,15 @@ export const mergeResults = (resultsOld, resultsNew) => {
     output.missed = [...resultsOld.missed, ...resultsNew.missed];
     output.passed = [...resultsOld.passed, ...resultsNew.passed];
     output.byKeys = Object.assign(Object.assign({}, resultsOld.byKeys), resultsNew.byKeys);
+    output.byTitles = Object.assign(Object.assign({}, resultsOld.byTitles), resultsNew.byTitles);
     output.errorsByKeys = Object.assign(Object.assign({}, resultsOld.errorsByKeys), resultsNew.errorsByKeys);
+    output.errorsByTitles = Object.assign(Object.assign({}, resultsOld.errorsByTitles), resultsNew.errorsByTitles);
     return output;
 };
 export function handleReqKey(key, data, reqs, deepKey = key) {
     let results = getResultDefaults();
     const hasNested = checkIsNested(reqs);
+    const keyTitle = 'title' in reqs ? reqs.title : deepKey;
     const missedCheck = [];
     const typeChecked = [];
     const rulesChecked = [];
@@ -46,11 +51,13 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
         results.missed.push(deepKey);
         results.failed.push(deepKey);
         results.byKeys[deepKey] = false;
+        results.byTitles[keyTitle] = false;
         return results;
     }
     if (hasNested) {
         const nestedReqKeys = Object.keys(reqs);
         results.byKeys[deepKey] = true;
+        results.byTitles[keyTitle] = true;
         let i = 0;
         while (i < nestedReqKeys.length) {
             const reqKeyI = nestedReqKeys[i];
@@ -61,13 +68,20 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
         return results;
     }
     if (reqs.required === true && key in data === false || data === undefined) {
-        const errMsg = _errors.getMissingError(deepKey);
+        let errMsg = _errors.getMissingError(deepKey);
+        if (reqs.customMessage && typeof reqs.customMessage === 'function') {
+            errMsg = reqs.customMessage({
+                value: data[key], key: deepKey, title: keyTitle, reqs: reqs, schema: this.schema
+            });
+        }
         missedCheck.push(false);
         results.missed.push(deepKey);
         results.failed.push(deepKey);
         results.errors.push(errMsg);
         results.byKeys[deepKey] = false;
+        results.byTitles[keyTitle] = false;
         results.errorsByKeys[deepKey] = [errMsg];
+        results.errorsByTitles[keyTitle] = [errMsg];
         return results;
     }
     const typeCheck = checkType(key, data[key], reqs, deepKey);
@@ -83,8 +97,11 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
         ruleCheck.details.forEach((el) => {
             if (deepKey in results.errorsByKeys)
                 results.errorsByKeys[deepKey] = [];
+            if (deepKey in results.errorsByTitles)
+                results.errorsByTitles[keyTitle] = [];
             results.errors.push(el);
             results.errorsByKeys[deepKey] = ['1'];
+            results.errorsByTitles[keyTitle] = ['1'];
         });
     }
     if (missedCheck.length)
@@ -98,7 +115,11 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
     results.errorsByKeys[deepKey] = [
         ...results.errors
     ];
+    results.errorsByTitles[keyTitle] = [
+        ...results.errors
+    ];
     results.byKeys[deepKey] = (missedCheck.length + typeChecked.length + rulesChecked.length) === 0;
+    results.byTitles[keyTitle] = (missedCheck.length + typeChecked.length + rulesChecked.length) === 0;
     return results;
 }
 const isCheckNeeded = (key, hasLimits, onlyKeys) => {

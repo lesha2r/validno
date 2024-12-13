@@ -3,7 +3,9 @@ export const defaultSchemaKeys = [
     "required",
     "type",
     "eachType",
-    "rules"
+    "rules",
+    "title",
+    "customMessage"
 ];
 export class Schema {
     constructor(inputSchema) {

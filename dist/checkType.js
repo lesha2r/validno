@@ -1,3 +1,4 @@
+import { ErrorKeywords } from "./constants/details.js";
 import _validations from "./utils/validations.js";
 const getErrorDetails = (key, expectedType, receivedValue) => {
     let receivedType = '';
@@ -32,7 +33,7 @@ const checkTypeMultiple = (key, value, requirements, keyName = key) => {
         const check = checkType(key, value, requirementsRe);
         if (check[0].passed === true) {
             result.passed = true;
-            result.details = 'Passed';
+            result.details = 'OK';
             return result;
         }
         i++;
@@ -41,8 +42,10 @@ const checkTypeMultiple = (key, value, requirements, keyName = key) => {
 };
 const checkType = (key, value, requirements, keyName = key) => {
     const isNotNull = value !== null;
+    const keyTitle = 'title' in requirements ? requirements.title : keyName;
+    const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function';
     if (value === undefined && requirements.required) {
-        return [{ key: keyName, passed: false, details: `Key ${keyName} is missing` }];
+        return [{ key: keyName, passed: false, details: `Значение "${keyName}" отсутствует` }];
     }
     let result = [];
     if (Array.isArray(requirements.type)) {
@@ -52,16 +55,28 @@ const checkType = (key, value, requirements, keyName = key) => {
         result.push({
             key: keyName,
             passed: true,
-            details: 'Passed'
+            details: 'OK'
         });
         return result;
     }
+    const customErrDetails = hasCustomMessage ?
+        requirements.customMessage({
+            keyword: ErrorKeywords.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle,
+            reqs: requirements,
+            schema: null
+        }) :
+        null;
+    const baseErrDetails = getErrorDetails(keyName, requirements.type, value);
+    const getDetails = (isOK) => isOK ? 'OK' : customErrDetails || baseErrDetails;
     switch (requirements.type) {
         case 'any':
             result.push({
                 key: keyName,
                 passed: true,
-                details: 'Passed'
+                details: 'OK'
             });
             break;
         case Number:
@@ -69,7 +84,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isNumber,
-                details: isNumber ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: getDetails(isNumber)
             });
             break;
         case String:
@@ -77,17 +92,17 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isString,
-                details: isString ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: getDetails(isString)
             });
             break;
         case Date:
             const isDate = isNotNull && value.constructor === Date;
             const isValid = isDate && !isNaN(value.getTime());
-            const errorMsg = isValid ? getErrorDetails(keyName, requirements.type, value) : 'Дата невалидна';
+            const errorMsg = isValid ? getDetails(isDate) : 'Дата невалидна';
             result.push({
                 key: keyName,
                 passed: isDate && isValid,
-                details: isDate && isValid ? 'Passed' : errorMsg
+                details: isDate && isValid ? 'OK' : errorMsg
             });
             break;
         case Boolean:
@@ -95,7 +110,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isBoolean,
-                details: isBoolean ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: isBoolean ? 'OK' : getDetails(isBoolean)
             });
             break;
         case Array:
@@ -104,7 +119,7 @@ const checkType = (key, value, requirements, keyName = key) => {
                 result.push({
                     key: keyName,
                     passed: false,
-                    details: getErrorDetails(keyName, requirements.type, value)
+                    details: getDetails(isArray)
                 });
                 break;
             }
@@ -123,7 +138,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isOk,
-                details: isOk ? 'Passed' : !isEachChecked.passed ? isEachChecked.details : getErrorDetails(keyName, requirements.type, value)
+                details: isOk ? 'OK' : !isEachChecked.passed ? isEachChecked.details : getDetails(isOk)
             });
             break;
         case Object:
@@ -131,7 +146,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isObject,
-                details: isObject ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: isObject ? 'OK' : getDetails(isObject)
             });
             break;
         case RegExp:
@@ -139,7 +154,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isRegex,
-                details: isRegex ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: isRegex ? 'OK' : getDetails(isRegex)
             });
             break;
         case null:
@@ -147,7 +162,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             result.push({
                 key: keyName,
                 passed: isNull,
-                details: isNull ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+                details: isNull ? 'OK' : getDetails(isNull)
             });
             break;
         default:

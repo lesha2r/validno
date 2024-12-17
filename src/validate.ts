@@ -3,6 +3,7 @@ import checkType from "./checkType.js";
 import _errors from "./utils/errors.js";
 import _validations from "./utils/validations.js";
 import { defaultSchemaKeys, Schema, TSchemaInput } from "./Schema.js";
+import { ErrorKeywords } from "./constants/details.js";
 
 export type TResult = {
     ok: null | boolean,
@@ -11,9 +12,7 @@ export type TResult = {
     passed: string[],
     errors: string[],
     byKeys: {[key: string]: boolean},
-    byTitles: {[key: string]: boolean},
     errorsByKeys: {[key: string]: string[]},
-    errorsByTitles: {[key: string]: string[]}
 };
 
 export const getResultDefaults = (): TResult => {
@@ -24,9 +23,7 @@ export const getResultDefaults = (): TResult => {
     passed: [],
     errors: [],
     byKeys: {},
-    byTitles: {},
     errorsByKeys: {},
-    errorsByTitles: {}
   };
 }
 
@@ -50,9 +47,7 @@ export const mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
   output.missed = [...resultsOld.missed, ...resultsNew.missed]
   output.passed = [...resultsOld.passed, ...resultsNew.passed]
   output.byKeys = {...resultsOld.byKeys, ...resultsNew.byKeys}
-  output.byTitles = {...resultsOld.byTitles, ...resultsNew.byTitles}
   output.errorsByKeys = {...resultsOld.errorsByKeys, ...resultsNew.errorsByKeys}
-  output.errorsByTitles = {...resultsOld.errorsByTitles, ...resultsNew.errorsByTitles}
 
   return output
 }
@@ -75,8 +70,7 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
     results.missed.push(deepKey)
     results.failed.push(deepKey)
     results.byKeys[deepKey] = false
-    // @ts-ignore
-    results.byTitles[keyTitle] = false
+
     return results
   }
 
@@ -84,8 +78,6 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
   if (hasNested) {
     const nestedReqKeys: string[] = Object.keys(reqs)
     results.byKeys[deepKey] = true
-        // @ts-ignore
-    results.byTitles[keyTitle] = true
 
     let i = 0;
     while (i < nestedReqKeys.length) {
@@ -112,11 +104,16 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
   // @ts-ignore
   if (reqs.required === true && key in data === false || data === undefined) {
     let errMsg = _errors.getMissingError(deepKey)
-
+    
     if (reqs.customMessage && typeof reqs.customMessage === 'function') {
       // @ts-ignore
       errMsg = reqs.customMessage({
-        value: data[key], key: deepKey, title: keyTitle, reqs: reqs, schema: this.schema
+        keyword: ErrorKeywords.Missing,
+        value: data[key],
+        key: deepKey,
+        title: keyTitle,
+        reqs: reqs,
+        schema: this.schema
       })
     }
 
@@ -125,11 +122,7 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
     results.failed.push(deepKey)
     results.errors.push(errMsg)
     results.byKeys[deepKey] = false
-    // @ts-ignore
-    results.byTitles[keyTitle] = false
-    results.errorsByKeys[deepKey] = [errMsg]
-    // @ts-ignore
-    results.errorsByTitles[keyTitle] = [errMsg]
+
     return results
   }
 
@@ -151,14 +144,9 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
     rulesChecked.push(false)
     ruleCheck.details.forEach((el) => {
       if (deepKey in results.errorsByKeys) results.errorsByKeys[deepKey] = []
-      // @ts-ignore
-      if (deepKey in results.errorsByTitles) results.errorsByTitles[keyTitle] = []
 
       results.errors.push(el)
-
       results.errorsByKeys[deepKey] = ['1']
-      // @ts-ignore
-      results.errorsByTitles[keyTitle] = ['1']
     })
   }
 
@@ -175,24 +163,14 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
     ...results.errors
   ]
 
-  // @ts-ignore
-  results.errorsByTitles[keyTitle] = [
-    ...results.errors
-  ]
-
   results.byKeys[deepKey] = (
-    missedCheck.length + typeChecked.length + rulesChecked.length
-  ) === 0
-
-  // @ts-ignore
-  results.byTitles[keyTitle] = (
     missedCheck.length + typeChecked.length + rulesChecked.length
   ) === 0
 
   return results
 }
 
-const isCheckNeeded = (key: string, hasLimits: boolean, onlyKeys?: string | string[]) => {
+const checkIfValidationIsNeeded = (key: string, hasLimits: boolean, onlyKeys?: string | string[]) => {
   return !hasLimits || (key === onlyKeys || Array.isArray(onlyKeys) && onlyKeys?.includes(key))
 }
 
@@ -201,7 +179,9 @@ function validate(schema: Schema, data: any, onlyKeys?: string | string[]): TRes
     const areKeysLimited = (Array.isArray(onlyKeys) && onlyKeys.length > 0) || (typeof onlyKeys === 'string' && onlyKeys.length > 0)
 
     for (const [key, reqs] of Object.entries(schema.schema)) {
-      if (isCheckNeeded(key, areKeysLimited, onlyKeys)) {
+      const isValidationRequired = checkIfValidationIsNeeded(key, areKeysLimited, onlyKeys)
+      
+      if (isValidationRequired) {
         // @ts-ignore
         const keyResult = handleReqKey.call(this, key, data, reqs)
 

@@ -121,6 +121,7 @@ function checkRules(key, value, requirements, inputObj) {
         return result;
     }
     const rules = requirements.rules;
+    const title = requirements.title || key;
     const allResults = [];
     const allRulesKeys = Object.keys(rules);
     let i = 0;
@@ -133,6 +134,17 @@ function checkRules(key, value, requirements, inputObj) {
         const func = rulesFunctions[ruleName];
         const args = rules[ruleName];
         const result = func(key, value, args, { schema: this.schema, input: inputObj });
+        if (requirements.customMessage && typeof requirements.customMessage === 'function') {
+            result.details = requirements.customMessage({
+                keyword: ruleName,
+                value: value,
+                key: key,
+                title: title,
+                reqs: requirements,
+                schema: this.schema,
+                rules: rules,
+            });
+        }
         allResults.push(result);
         i++;
     }

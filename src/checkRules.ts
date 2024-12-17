@@ -1,3 +1,4 @@
+import { ErrorKeywords } from "./constants/details.js";
 import { TSchema, TSchemaItem } from "./Schema.js";
 import _validations from "./utils/validations.js"
 
@@ -144,6 +145,7 @@ function checkRules (this: any, key: string, value: any, requirements: TSchemaIt
     }
 
     const rules: TRule = requirements.rules
+    const title = requirements.title || key
 
     const allResults = []
     const allRulesKeys = Object.keys(rules)
@@ -162,6 +164,19 @@ function checkRules (this: any, key: string, value: any, requirements: TSchemaIt
         const args = rules[ruleName]
 
         const result = func(key, value, args, {schema: this.schema, input: inputObj})
+        
+        if (requirements.customMessage && typeof requirements.customMessage === 'function') {
+            result.details = requirements.customMessage({
+                keyword: ruleName,
+                value: value,
+                key: key,
+                title: title,
+                reqs: requirements,
+                schema: this.schema,
+                rules: rules,
+            })
+        }
+
         allResults.push(result)
 
         i++;

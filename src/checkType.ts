@@ -1,3 +1,4 @@
+import { ErrorKeywords } from "./constants/details.js";
 import { TSchemaInput, TSchemaItem } from "./Schema.js";
 import _validations from "./utils/validations.js";
 
@@ -32,7 +33,7 @@ const checkTypeMultiple = (key: string, value: any, requirements: TSchemaItem | 
 
     if (check[0].passed === true) {
       result.passed = true
-      result.details = 'Passed'
+      result.details = 'OK'
       return result
     }
 
@@ -46,9 +47,11 @@ type TCheckTypeResult = {key: string, passed: boolean, details: string}
 
 const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaInput, keyName = key): TCheckTypeResult[] => {
     const isNotNull = value !== null
+    const keyTitle = 'title' in requirements ? requirements.title : keyName
+    const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function'
     
     if (value === undefined && requirements.required) {
-      return [{key: keyName, passed: false, details: `Key ${keyName} is missing`}]
+      return [{key: keyName, passed: false, details: `Значение "${keyName}" отсутствует`}]
     }
 
     let result: TCheckTypeResult[] = []
@@ -61,17 +64,34 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
       result.push({
         key: keyName,
         passed: true,
-        details: 'Passed'
+        details: 'OK'
       })
       return result
     }
+
+    
+    const customErrDetails = hasCustomMessage ?
+      //@ts-ignore
+      requirements.customMessage({
+        keyword: ErrorKeywords.Type,
+        value: value,
+        key: keyName,
+        title: keyTitle,
+        reqs: requirements,
+        schema: null
+      }) :
+      null;
+
+    const baseErrDetails = getErrorDetails(keyName, requirements.type, value)
   
+    const getDetails = (isOK: boolean) => isOK ? 'OK' : customErrDetails || baseErrDetails
+
     switch (requirements.type) {
       case 'any':
         result.push({
           key: keyName,
           passed: true,
-          details: 'Passed'
+          details: 'OK'
         })
         break;
       case Number:
@@ -80,7 +100,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isNumber,
-          details: isNumber ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: getDetails(isNumber)
         })
 
         break;
@@ -90,18 +110,18 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isString,
-          details: isString ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: getDetails(isString)
         })
         break;
       case Date:
         const isDate = isNotNull && value.constructor === Date
         const isValid = isDate && !isNaN(value.getTime())
-        const errorMsg = isValid ? getErrorDetails(keyName, requirements.type, value) : 'Дата невалидна'
+        const errorMsg = isValid ? getDetails(isDate) : 'Дата невалидна'
 
         result.push({
           key: keyName,
           passed: isDate && isValid,
-          details: isDate && isValid ? 'Passed' : errorMsg
+          details: isDate && isValid ? 'OK' : errorMsg
         })
         break;
       case Boolean:
@@ -110,7 +130,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isBoolean,
-          details: isBoolean ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: isBoolean ? 'OK' : getDetails(isBoolean)
         })
         break;
       case Array:
@@ -120,7 +140,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
           result.push({
               key: keyName,
               passed: false,
-              details: getErrorDetails(keyName, requirements.type, value)
+              details: getDetails(isArray)
           });
           
           break;
@@ -146,16 +166,17 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isOk,
-          details: isOk ? 'Passed' : !isEachChecked.passed ? isEachChecked.details : getErrorDetails(keyName, requirements.type, value)
+          details: isOk ? 'OK' : !isEachChecked.passed ? isEachChecked.details : getDetails(isOk)
         })
 
         break;
       case Object:
         const isObject = _validations.isObject(value) && value.constructor === Object
+
         result.push({
           key: keyName,
           passed: isObject,
-          details: isObject ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: isObject ? 'OK' : getDetails(isObject)
         })
 
         break;
@@ -164,7 +185,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isRegex,
-          details: isRegex ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: isRegex ? 'OK' : getDetails(isRegex)
         })
 
         break;
@@ -174,7 +195,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         result.push({
           key: keyName,
           passed: isNull,
-          details: isNull ? 'Passed' : getErrorDetails(keyName, requirements.type, value)
+          details: isNull ? 'OK' : getDetails(isNull)
         })
 
         break;

@@ -1,9 +1,13 @@
-import checkRules from "./checkRules.js";
 import checkType from "./checkType.js";
 import _errors from "./utils/errors.js";
+import checkRules from "./checkRules.js";
 import _validations from "./utils/validations.js";
-import { defaultSchemaKeys } from "./Schema.js";
 import { ErrorKeywords } from "./constants/details.js";
+import { defaultSchemaKeys } from "./Schema.js";
+function joinErrors(separator = ';') {
+    var _a;
+    return ((_a = this.errors) === null || _a === void 0 ? void 0 : _a.join(`${separator} `)) || '';
+}
 export const getResultDefaults = () => {
     return {
         ok: null,
@@ -78,6 +82,9 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
         results.missed.push(deepKey);
         results.failed.push(deepKey);
         results.errors.push(errMsg);
+        if (deepKey in results.errorsByKeys === false)
+            results.errorsByKeys[deepKey] = [];
+        results.errorsByKeys[deepKey].push(errMsg);
         results.byKeys[deepKey] = false;
         return results;
     }
@@ -129,7 +136,23 @@ function validate(schema, data, onlyKeys) {
         results.ok = false;
     else
         results.ok = true;
-    return results;
+    return new ValidnoResult(results);
 }
 ;
+class ValidnoResult {
+    constructor(results) {
+        this.ok = results.ok;
+        this.missed = results.missed;
+        this.failed = results.failed;
+        this.passed = results.passed;
+        this.errors = results.errors;
+        this.byKeys = results.byKeys;
+        this.errorsByKeys = results.errorsByKeys;
+        this.byKeys = results.byKeys;
+    }
+    joinErrors(separator = '; ') {
+        var _a;
+        return ((_a = this.errors) === null || _a === void 0 ? void 0 : _a.join(`${separator} `)) || '';
+    }
+}
 export default validate;

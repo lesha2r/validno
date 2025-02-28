@@ -5,7 +5,8 @@ export const defaultSchemaKeys = [
     "eachType",
     "rules",
     "title",
-    "customMessage"
+    "customMessage",
+    "joinErrors"
 ];
 export class Schema {
     constructor(inputSchema) {

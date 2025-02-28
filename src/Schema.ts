@@ -19,7 +19,8 @@ export const enum ESchemaFields {
     EachType = 'eachType',
     Rules = 'rules',
     Title = 'title',
-    CustomMessage = 'customMessage'
+    CustomMessage = 'customMessage',
+    JoinErrors = 'joinErrors'
 }
 
 export const defaultSchemaKeys = [
@@ -28,7 +29,8 @@ export const defaultSchemaKeys = [
     ESchemaFields.EachType,
     ESchemaFields.Rules,
     ESchemaFields.Title,
-    ESchemaFields.CustomMessage
+    ESchemaFields.CustomMessage,
+    ESchemaFields.JoinErrors
 ]
 
 export type TSchema = TSchemaInput

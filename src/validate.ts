@@ -1,9 +1,9 @@
-import checkRules from "./checkRules.js";
 import checkType from "./checkType.js";
 import _errors from "./utils/errors.js";
+import checkRules from "./checkRules.js";
 import _validations from "./utils/validations.js";
-import { defaultSchemaKeys, Schema, TSchemaInput } from "./Schema.js";
 import { ErrorKeywords } from "./constants/details.js";
+import { defaultSchemaKeys, Schema, TSchemaInput } from "./Schema.js";
 
 export type TResult = {
     ok: null | boolean,
@@ -14,6 +14,10 @@ export type TResult = {
     byKeys: {[key: string]: boolean},
     errorsByKeys: {[key: string]: string[]},
 };
+
+function joinErrors(this: TResult, separator = ';') {
+  return this.errors?.join(`${separator} `) || ''
+}
 
 export const getResultDefaults = (): TResult => {
   return {
@@ -121,6 +125,8 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
     results.missed.push(deepKey)
     results.failed.push(deepKey)
     results.errors.push(errMsg)
+    if (deepKey in results.errorsByKeys === false) results.errorsByKeys[deepKey] = []
+    results.errorsByKeys[deepKey].push(errMsg)
     results.byKeys[deepKey] = false
 
     return results
@@ -191,8 +197,26 @@ function validate(schema: Schema, data: any, onlyKeys?: string | string[]): TRes
   
     if (results.failed.length) results.ok = false
     else results.ok = true
-    
-    return results;
+
+    return new ValidnoResult(results);
 };
+
+interface ValidnoResult extends TResult { }
+class ValidnoResult {
+  constructor(results: TResult) {
+    this.ok = results.ok
+    this.missed = results.missed
+    this.failed = results.failed
+    this.passed = results.passed
+    this.errors = results.errors
+    this.byKeys = results.byKeys
+    this.errorsByKeys = results.errorsByKeys
+    this.byKeys = results.byKeys
+  }
+
+  joinErrors(separator = '; ') {
+    return this.errors?.join(`${separator} `) || ''
+  }
+}
 
 export default validate;

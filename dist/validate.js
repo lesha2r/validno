@@ -4,10 +4,6 @@ import checkRules from "./checkRules.js";
 import _validations from "./utils/validations.js";
 import { ErrorKeywords } from "./constants/details.js";
 import { defaultSchemaKeys } from "./Schema.js";
-function joinErrors(separator = ';') {
-    var _a;
-    return ((_a = this.errors) === null || _a === void 0 ? void 0 : _a.join(`${separator} `)) || '';
-}
 export const getResultDefaults = () => {
     return {
         ok: null,
@@ -66,7 +62,9 @@ export function handleReqKey(key, data, reqs, deepKey = key) {
         }
         return results;
     }
-    if (reqs.required === true && key in data === false || data === undefined) {
+    if (reqs.required === true &&
+        (key in data === false || data === undefined || data[key] === undefined)) {
+        console.log(data);
         let errMsg = _errors.getMissingError(deepKey);
         if (reqs.customMessage && typeof reqs.customMessage === 'function') {
             errMsg = reqs.customMessage({
@@ -151,8 +149,7 @@ class ValidnoResult {
         this.byKeys = results.byKeys;
     }
     joinErrors(separator = '; ') {
-        var _a;
-        return ((_a = this.errors) === null || _a === void 0 ? void 0 : _a.join(`${separator} `)) || '';
+        return _errors.joinErrors(this.errors, separator);
     }
 }
 export default validate;

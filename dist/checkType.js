@@ -1,31 +1,12 @@
 import { ErrorKeywords } from "./constants/details.js";
 import _validations from "./utils/validations.js";
-const getErrorDetails = (key, expectedType, receivedValue) => {
-    let receivedType = '';
-    if (typeof receivedValue === 'string')
-        receivedType = 'String';
-    else if (typeof receivedValue === 'number')
-        receivedType = 'Number';
-    else if (typeof receivedValue === 'boolean')
-        receivedType = 'Noolean';
-    else if (receivedValue === null)
-        receivedType = 'null';
-    else if (Array.isArray(receivedValue))
-        receivedType = 'Array';
-    else if (_validations.isDate(receivedValue))
-        receivedType = 'Date';
-    else if (_validations.isObject(receivedValue))
-        receivedType = 'Object';
-    else if (receivedValue === undefined)
-        receivedType = 'undefined';
-    return `Проверьте тип "${key}": ожидался ${(expectedType === null || expectedType === void 0 ? void 0 : expectedType.name) || expectedType}, получен ${receivedType || 'unknown'}`;
-};
+import _errors from "./utils/errors.js";
 const checkTypeMultiple = (key, value, requirements, keyName = key) => {
     const constructorNames = requirements.type.map((el) => String((el === null || el === void 0 ? void 0 : el.name) || el));
     const result = {
         key: keyName,
         passed: false,
-        details: getErrorDetails(keyName, constructorNames.join('/'), value)
+        details: _errors.getErrorDetails(keyName, constructorNames.join('/'), value)
     };
     let i = 0;
     while (i < requirements.type.length) {
@@ -69,9 +50,10 @@ const checkType = (key, value, requirements, keyName = key) => {
             schema: null
         }) :
         null;
-    const baseErrDetails = getErrorDetails(keyName, requirements.type, value);
+    const baseErrDetails = _errors.getErrorDetails(keyName, requirements.type, value);
     const getDetails = (isOK) => isOK ? 'OK' : customErrDetails || baseErrDetails;
-    switch (requirements.type) {
+    const typeBySchema = requirements.type;
+    switch (typeBySchema) {
         case 'any':
             result.push({
                 key: keyName,
@@ -166,10 +148,13 @@ const checkType = (key, value, requirements, keyName = key) => {
             });
             break;
         default:
+            const isInstanceOf = value instanceof typeBySchema;
+            const isConstructorSame = value.constructor.name === typeBySchema.name;
+            const checked = isInstanceOf && isConstructorSame;
             result.push({
                 key: keyName,
-                passed: false,
-                details: `Тип '${keyName}' не определен`
+                passed: checked,
+                details: getDetails(checked)
             });
     }
     return result;

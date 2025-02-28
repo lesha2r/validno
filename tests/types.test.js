@@ -248,12 +248,13 @@ describe("Проверка всех типов сразу", () => {
         }
 
         const res = schema.validate(obj)
-        expect(res.ok).toBe(true)
+
         const arePassed = []
         for (const key in obj) {
             arePassed.push(res.byKeys[key])
         }
 
+        expect(res.ok).toBe(true)
         expect(arePassed.every(el => el === true)).toBe(true)
         expect(res.errors.length).toBe(0)
     })

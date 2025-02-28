@@ -15,10 +15,6 @@ export type TResult = {
     errorsByKeys: {[key: string]: string[]},
 };
 
-function joinErrors(this: TResult, separator = ';') {
-  return this.errors?.join(`${separator} `) || ''
-}
-
 export const getResultDefaults = (): TResult => {
   return {
     ok: null,
@@ -105,8 +101,13 @@ export function handleReqKey(this: any, key: string, data: any, reqs: TSchemaInp
   }
 
   // Check missing keys
-  // @ts-ignore
-  if (reqs.required === true && key in data === false || data === undefined) {
+
+  if (
+    // @ts-ignore
+    reqs.required === true &&
+    (key in data === false || data === undefined || data[key] === undefined)
+  ) {
+    console.log(data)
     let errMsg = _errors.getMissingError(deepKey)
     
     if (reqs.customMessage && typeof reqs.customMessage === 'function') {
@@ -215,7 +216,7 @@ class ValidnoResult {
   }
 
   joinErrors(separator = '; ') {
-    return this.errors?.join(`${separator} `) || ''
+    return _errors.joinErrors(this.errors, separator)
   }
 }
 

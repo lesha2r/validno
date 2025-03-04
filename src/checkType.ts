@@ -190,7 +190,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
         break;
       default:
         const isInstanceOf = value instanceof typeBySchema
-        const isConstructorSame = value.constructor.name === typeBySchema.name
+        const isConstructorSame = value.constructor?.name === typeBySchema?.name
         const checked = isInstanceOf && isConstructorSame
 
         result.push({

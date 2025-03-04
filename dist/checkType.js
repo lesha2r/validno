@@ -22,6 +22,7 @@ const checkTypeMultiple = (key, value, requirements, keyName = key) => {
     return result;
 };
 const checkType = (key, value, requirements, keyName = key) => {
+    var _a;
     const isNotNull = value !== null;
     const keyTitle = 'title' in requirements ? requirements.title : keyName;
     const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function';
@@ -149,7 +150,7 @@ const checkType = (key, value, requirements, keyName = key) => {
             break;
         default:
             const isInstanceOf = value instanceof typeBySchema;
-            const isConstructorSame = value.constructor.name === typeBySchema.name;
+            const isConstructorSame = ((_a = value.constructor) === null || _a === void 0 ? void 0 : _a.name) === (typeBySchema === null || typeBySchema === void 0 ? void 0 : typeBySchema.name);
             const checked = isInstanceOf && isConstructorSame;
             result.push({
                 key: keyName,

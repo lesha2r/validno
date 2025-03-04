@@ -16,27 +16,24 @@ export interface IKeyHandler {
 }
 
 function generateMsg(this: any, input: IKeyHandler) {
-  let {results, key, deepKey, data, reqs} = input
+  let {key, deepKey, data, reqs} = input
 
   const keyForMsg = deepKey || key
-
   const keyTitle = 'title' in reqs ? reqs.title : keyForMsg
-  
-  if (reqs.customMessage && typeof reqs.customMessage === 'function') {
-    // @ts-ignore
-    const errMsg = reqs.customMessage({
-      keyword: ErrorKeywords.Missing,
-      value: data[key],
-      key: keyForMsg,
-      title: keyTitle,
-      reqs: reqs,
-      schema: this.schema
-    })
 
-    return errMsg
-  }
-  
-  return _errors.getMissingError(keyForMsg)
+  if (!reqs.customMessage)   return _errors.getMissingError(keyForMsg)
+
+  // @ts-ignore
+  const errMsg = reqs.customMessage({
+    keyword: ErrorKeywords.Missing,
+    value: data[key],
+    key: keyForMsg,
+    title: keyTitle,
+    reqs: reqs,
+    schema: this.schema
+  })
+
+  return errMsg
 }
 
 function handleDeepKey(
@@ -155,7 +152,7 @@ function validate(
   data: unknown,
   keysToCheck?: string | string[]
 ): ValidnoResult {
-    const results = new ValidnoResult()
+    const output = new ValidnoResult()
     const hasKeysToCheck = _helpers.areKeysLimited(keysToCheck)
     const schemaKeys = Object.entries(schema.schema)
 
@@ -165,11 +162,11 @@ function validate(
         
       // @ts-ignore
       const keyResult = handleKey.call(this, {key, data, reqs})
-      results.merge(keyResult)
+      output.merge(keyResult)
     }
   
-    results.finish()
-    return results
+    output.finish()
+    return output
 };
 
 export default validate;

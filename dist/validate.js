@@ -5,21 +5,20 @@ import _helpers from "./utils/helpers.js";
 import { ErrorKeywords } from "./constants/details.js";
 import ValidnoResult from "./ValidnoResult.js";
 function generateMsg(input) {
-    let { results, key, deepKey, data, reqs } = input;
+    let { key, deepKey, data, reqs } = input;
     const keyForMsg = deepKey || key;
     const keyTitle = 'title' in reqs ? reqs.title : keyForMsg;
-    if (reqs.customMessage && typeof reqs.customMessage === 'function') {
-        const errMsg = reqs.customMessage({
-            keyword: ErrorKeywords.Missing,
-            value: data[key],
-            key: keyForMsg,
-            title: keyTitle,
-            reqs: reqs,
-            schema: this.schema
-        });
-        return errMsg;
-    }
-    return _errors.getMissingError(keyForMsg);
+    if (!reqs.customMessage)
+        return _errors.getMissingError(keyForMsg);
+    const errMsg = reqs.customMessage({
+        keyword: ErrorKeywords.Missing,
+        value: data[key],
+        key: keyForMsg,
+        title: keyTitle,
+        reqs: reqs,
+        schema: this.schema
+    });
+    return errMsg;
 }
 function handleDeepKey(input) {
     const { results, key, deepKey, data, reqs } = input;
@@ -98,7 +97,7 @@ export function handleKey(input) {
     return results.finish();
 }
 function validate(schema, data, keysToCheck) {
-    const results = new ValidnoResult();
+    const output = new ValidnoResult();
     const hasKeysToCheck = _helpers.areKeysLimited(keysToCheck);
     const schemaKeys = Object.entries(schema.schema);
     for (const [key, reqs] of schemaKeys) {
@@ -106,10 +105,10 @@ function validate(schema, data, keysToCheck) {
         if (!toBeValidated)
             continue;
         const keyResult = handleKey.call(this, { key, data, reqs });
-        results.merge(keyResult);
+        output.merge(keyResult);
     }
-    results.finish();
-    return results;
+    output.finish();
+    return output;
 }
 ;
 export default validate;

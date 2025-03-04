@@ -1,6 +1,5 @@
-import { ErrorKeywords } from "./constants/details.js";
-import { TSchema, TSchemaItem } from "./Schema.js";
 import _validations from "./utils/validations.js"
+import { TSchema, TSchemaItem } from "./Schema.js";
 
 export type TRule = {[key: string]: any}
 

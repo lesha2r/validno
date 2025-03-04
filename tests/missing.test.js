@@ -128,4 +128,77 @@ describe('Тестирование обработки пропущенных с�
             }
         })
     })
+
+    test('Отсутствующие ключи в deep объекте корректно отображаются в результате', () => {
+        const scheme = new Schema({
+            parent: {
+                childA: {
+                    childA1: {
+                        type: String,
+                        required: true
+                    },
+                    childA2: {
+                        type: String,
+                        required: true
+                    }
+                },
+                childB: {
+                    type: String,
+                    required: true
+                }
+            },
+            parentBMissing: {
+                type: String,
+                required: true
+            },
+            keyOk: {
+                type: String,
+                required: true
+            },
+            notRequired: {
+                type: String,
+                required: false
+            }
+        })
+
+        const obj = {
+            parent: {
+                // childA: 
+                childB: 'str'
+            },
+            keyOk: 'x'
+        }
+
+        const result = scheme.validate(obj)
+
+        expect(result).toEqual({
+            ok: false,
+            failed: ['parent','parent.childA','parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'],
+            missed: ['parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'],
+            errors: [
+                "Ключ 'parent.childA.childA1' отсутствует",
+                "Ключ 'parent.childA.childA2' отсутствует",
+                "Ключ 'parentBMissing' отсутствует",
+            ],
+            passed: ['parent.childB', 'keyOk', 'notRequired'],
+            byKeys: {
+                parent: false,
+                'parent.childA': false,
+                'parent.childA.childA1': false,
+                'parent.childA.childA2': false,
+                'parent.childB': true,
+                parentBMissing: false,
+                keyOk: true,
+                notRequired: true
+            },
+            errorsByKeys: {
+                'keyOk': [],
+                'parent.childB': [],
+                'notRequired': [],
+                'parent.childA.childA1': ["Ключ 'parent.childA.childA1' отсутствует"],
+                'parent.childA.childA2': ["Ключ 'parent.childA.childA2' отсутствует"],
+                parentBMissing: [ "Ключ 'parentBMissing' отсутствует" ]
+            }
+        })
+    })
 })

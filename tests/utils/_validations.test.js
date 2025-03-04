@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import _validations from '../dist/utils/validations.js';
+import _validations from '../../dist/utils/validations.js';
 
 class TypesAndValues {
     constructor() {

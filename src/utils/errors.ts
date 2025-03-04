@@ -1,6 +1,6 @@
 const _errors: {[key: string]: Function} = {}
 
-_errors.getMissingError = (key: string) => `Ключ '${key}' отсутствует`
+_errors.getMissingError = (key: string = 'na') => `Отсутствует значение '${key}'`
 
 _errors.getErrorDetails = (key: string, expectedType: any, receivedValue: any) => {
     let receivedType = ''
@@ -9,7 +9,12 @@ _errors.getErrorDetails = (key: string, expectedType: any, receivedValue: any) =
     else if (receivedValue === null) receivedType = 'null'
     else receivedType = receivedValue.constructor?.name || typeof receivedValue || 'na'
 
-    return `Проверьте тип "${key}": ожидался ${expectedType?.name || expectedType}, получен ${receivedType || 'unknown'}`;
+    const expectedOutput = expectedType?.name || expectedType
+    const receivedOutput = receivedType || 'na'
+
+    if (String(expectedOutput) === String(receivedOutput)) return ''
+
+    return `Проверьте тип '${key}': ожидался ${expectedOutput}, получен ${receivedOutput}`;
 };
 
 _errors.joinErrors = (errorsArr: string[], separator = '; ') => {

@@ -8,7 +8,6 @@ class ValidnoResult {
         this.errors = (results === null || results === void 0 ? void 0 : results.errors) || [];
         this.byKeys = (results === null || results === void 0 ? void 0 : results.byKeys) || {};
         this.errorsByKeys = (results === null || results === void 0 ? void 0 : results.errorsByKeys) || {};
-        this.byKeys = (results === null || results === void 0 ? void 0 : results.byKeys) || {};
     }
     setKeyStatus(key, result) {
         this.byKeys[key] = result;
@@ -75,6 +74,17 @@ class ValidnoResult {
             this.ok = true;
         this.clearEmptyErrorsByKeys();
         return this;
+    }
+    data() {
+        return {
+            ok: this.ok,
+            missed: this.missed,
+            failed: this.failed,
+            passed: this.passed,
+            errors: this.errors,
+            byKeys: this.byKeys,
+            errorsByKeys: this.errorsByKeys,
+        };
     }
 }
 export default ValidnoResult;

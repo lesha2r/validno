@@ -1,3 +1,4 @@
+import _helpers from "./helpers.js";
 const _validations = {};
 _validations.isString = (value) => {
     return typeof value === 'string';
@@ -81,23 +82,13 @@ _validations.hasKey = (obj, key) => {
         return false;
     return key in obj;
 };
-const compareArrs = (v1, v2) => {
-    if (v1.length !== v2.length)
-        return false;
-    return v1.every((el, i) => {
-        if (_validations.isObject(el)) {
-            return JSON.stringify(el) === JSON.stringify(v2[i]);
-        }
-        return v2[i] === el;
-    });
-};
 _validations.is = (value, compareTo) => {
     if (value === compareTo) {
         return true;
     }
     const bothArrays = _validations.isArray(value) && _validations.isArray(compareTo);
     if (bothArrays) {
-        return compareArrs(value, compareTo);
+        return _helpers.compareArrs(value, compareTo);
     }
     const bothObjects = _validations.isObject(value) && _validations.isObject(compareTo);
     if (bothObjects) {

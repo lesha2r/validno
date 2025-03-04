@@ -21,7 +21,6 @@ class ValidnoResult {
     this.errors = results?.errors || []
     this.byKeys = results?.byKeys || {}
     this.errorsByKeys = results?.errorsByKeys || {}
-    this.byKeys = results?.byKeys || {}
   }
 
   setKeyStatus(key: string, result: boolean) {
@@ -102,6 +101,18 @@ class ValidnoResult {
       this.clearEmptyErrorsByKeys()
 
       return this
+  }
+
+  data() {
+    return {
+      ok: this.ok,
+      missed: this.missed,
+      failed: this.failed,
+      passed: this.passed,
+      errors: this.errors,
+      byKeys: this.byKeys,
+      errorsByKeys:this.errorsByKeys,
+    }
   }
 }
 

@@ -150,7 +150,11 @@ export function handleKey(
     return results.finish()
 }
 
-function validate(schema: Schema, data: any, keysToCheck?: string | string[]): TResult {
+function validate(
+  schema: Schema,
+  data: unknown,
+  keysToCheck?: string | string[]
+): ValidnoResult {
     const results = new ValidnoResult()
     const hasKeysToCheck = _helpers.areKeysLimited(keysToCheck)
     const schemaKeys = Object.entries(schema.schema)

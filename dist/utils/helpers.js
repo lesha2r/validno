@@ -1,5 +1,4 @@
 import { defaultSchemaKeys } from "../Schema.js";
-import ValidnoResult from "../ValidnoResult.js";
 import _validations from "./validations.js";
 const _helpers = {};
 _helpers.checkIsNested = (obj) => {
@@ -12,16 +11,6 @@ _helpers.checkIsNested = (obj) => {
     else {
         return true;
     }
-};
-_helpers.mergeResults = (resultsOld, resultsNew) => {
-    const output = new ValidnoResult();
-    output.failed = [...resultsOld.failed, ...resultsNew.failed];
-    output.errors = [...resultsOld.errors, ...resultsNew.errors];
-    output.missed = [...resultsOld.missed, ...resultsNew.missed];
-    output.passed = [...resultsOld.passed, ...resultsNew.passed];
-    output.byKeys = Object.assign(Object.assign({}, resultsOld.byKeys), resultsNew.byKeys);
-    output.errorsByKeys = Object.assign(Object.assign({}, resultsOld.errorsByKeys), resultsNew.errorsByKeys);
-    return output;
 };
 _helpers.checkNestedIsMissing = (reqs, data) => {
     const isRequired = reqs.required;
@@ -44,5 +33,15 @@ _helpers.hasMissing = (input) => {
     const isRequired = reqs.required === true;
     const missingData = (data === undefined || key in data === false || data[key] === undefined);
     return isRequired && missingData;
+};
+_helpers.compareArrs = (v1, v2) => {
+    if (v1.length !== v2.length)
+        return false;
+    return v1.every((el, i) => {
+        if (_validations.isObject(el)) {
+            return JSON.stringify(el) === JSON.stringify(v2[i]);
+        }
+        return v2[i] === el;
+    });
 };
 export default _helpers;

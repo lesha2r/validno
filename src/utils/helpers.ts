@@ -17,19 +17,6 @@ _helpers.checkIsNested = (obj: {[key: string]: any}) => {
   }
 }
 
-_helpers.mergeResults = (resultsOld: TResult, resultsNew: TResult) => {
-  const output = new ValidnoResult()
-
-  output.failed = [...resultsOld.failed, ...resultsNew.failed]
-  output.errors = [...resultsOld.errors, ...resultsNew.errors]
-  output.missed = [...resultsOld.missed, ...resultsNew.missed]
-  output.passed = [...resultsOld.passed, ...resultsNew.passed]
-  output.byKeys = {...resultsOld.byKeys, ...resultsNew.byKeys}
-  output.errorsByKeys = {...resultsOld.errorsByKeys, ...resultsNew.errorsByKeys}
-
-  return output
-}
-
 _helpers.checkNestedIsMissing = (reqs: TSchemaInput, data: any) => {
   const isRequired = reqs.required
   const isUndef = data === undefined
@@ -64,6 +51,17 @@ _helpers.hasMissing = (input: IKeyHandler) => {
   const missingData = (data === undefined || key in data === false || data[key] === undefined)
 
   return isRequired && missingData
+}
+
+_helpers.compareArrs = (v1: unknown[], v2: unknown[]) => {
+  if (v1.length !== v2.length) return false;
+  return v1.every((el: unknown, i: number) => {
+      if (_validations.isObject(el)) {
+          return JSON.stringify(el) === JSON.stringify(v2[i])
+      }
+
+      return v2[i] === el
+  })
 }
 
 export default _helpers

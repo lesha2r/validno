@@ -1,6 +1,8 @@
-import {isDeepStrictEqual} from 'node:util'
+import _helpers from "./helpers.js";
 
-const _validations: {[key: string]: Function} = {};
+const _validations: {
+  [key: string]: Function,
+} = {};
 
 // TYPES ::::::::::::::::::::::::::::::::::::::::::::::::::
 _validations.isString = (value: any) => {
@@ -98,17 +100,6 @@ _validations.hasKey = (obj: object, key: string) => {
   return key in obj;
 };
 
-const compareArrs = (v1: unknown[], v2: unknown[]) => {
-  if (v1.length !== v2.length) return false;
-  return v1.every((el: unknown, i: number) => {
-      if (_validations.isObject(el)) {
-          return JSON.stringify(el) === JSON.stringify(v2[i])
-      }
-
-      return v2[i] === el
-  })
-}
-
 _validations.is = (value: any, compareTo: any) => {
       if (value === compareTo) {
           return true // Сразу вернуть, если совпадают
@@ -117,7 +108,7 @@ _validations.is = (value: any, compareTo: any) => {
         const bothArrays = _validations.isArray(value) && _validations.isArray(compareTo)
   
         if (bothArrays) {
-          return compareArrs(value, compareTo)
+          return _helpers.compareArrs(value, compareTo)
         }
   
         const bothObjects = _validations.isObject(value) && _validations.isObject(compareTo)

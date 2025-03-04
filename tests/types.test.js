@@ -193,8 +193,9 @@ describe('Проверка каждого типа по отдельности',
         const objOK = {
             [key]: { test: 1}
         }
-
+        
         const resOK = scheme.validate(objOK)
+
         expect(resOK.ok).toBe(true)
         expect(resOK.passed.includes(key)).toBe(true)
         expect(resOK.byKeys[key]).toBe(true)

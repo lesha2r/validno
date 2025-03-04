@@ -46,7 +46,7 @@ function handleDeepKey(
   const {results, key, deepKey, data, reqs} = input
 
   const nesctedKeys: string[] = Object.keys(reqs)
-  results.fixByKey(deepKey, false)
+  const nestedResults: boolean[] = []
 
   let i = 0;
   while (i < nesctedKeys.length) {
@@ -61,11 +61,13 @@ function handleDeepKey(
     }
 
     const deepResults = handleKey.call(this, deepParams)
-  
+    nestedResults.push(deepResults.ok!)
     results.merge(deepResults)
 
     i++
   }
+
+  results.fixParentByChilds(deepKey, nestedResults)
 
   return results
 }
@@ -88,7 +90,7 @@ export function handleKey(
 
     // If nested key is present but no data provided
     if (_helpers.checkNestedIsMissing(reqs, data)) {
-      results.pushMissing(deepKey)
+      results.setMissing(deepKey)
       return results
     }
 
@@ -102,7 +104,7 @@ export function handleKey(
       let errMsg = generateMsg.call(this, input)
 
       missedCheck.push(false)
-      results.pushMissing(deepKey, errMsg)
+      results.setMissing(deepKey, errMsg)
 
       return results
     }
@@ -131,15 +133,19 @@ export function handleKey(
     }
 
     // Combine final result
-    if (missedCheck.length) results.pushMissing(deepKey)
+    if (missedCheck.length) results.setMissing(deepKey)
     
     const isPassed = (!typeChecked.length && !rulesChecked.length && !missedCheck.length)
 
-    results.fixByKey(deepKey, isPassed)
+    if (!isPassed) {
+      results.setFailed(deepKey)
 
-    results.errorsByKeys[deepKey] = [
-      ...results.errors
-    ]
+      results.errorsByKeys[deepKey] = [
+        ...results.errors
+      ]
+    } else {
+      results.setPassed(deepKey)
+    }
 
     return results.finish()
 }

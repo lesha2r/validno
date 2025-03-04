@@ -45,7 +45,6 @@ describe('Тестирование обработки пропущенных с�
                 [okKey]: true
             },
             errorsByKeys: {
-                [okKey]: [],
                 [missedKey]: [_errors.getMissingError(missedKey)],
                 [missedKey2]: [_errors.getMissingError(missedKey2)]
             }
@@ -85,8 +84,6 @@ describe('Тестирование обработки пропущенных с�
                 [key2]: true
             },
             errorsByKeys: {
-                [key]: [],
-                [key2]: []
             }
         })
     })
@@ -123,8 +120,6 @@ describe('Тестирование обработки пропущенных с�
                 [key2]: true
             },
             errorsByKeys: {
-                [key]: [],
-                [key2]: []
             }
         })
     })
@@ -171,16 +166,21 @@ describe('Тестирование обработки пропущенных с�
 
         const result = scheme.validate(obj)
 
+        result.failed.sort()
+        result.missed.sort()
+        result.errors.sort()
+        result.passed.sort()
+
         expect(result).toEqual({
             ok: false,
-            failed: ['parent','parent.childA','parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'],
-            missed: ['parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'],
+            failed: ['parent','parent.childA','parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'].sort(),
+            missed: ['parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'].sort(),
             errors: [
                 "Ключ 'parent.childA.childA1' отсутствует",
                 "Ключ 'parent.childA.childA2' отсутствует",
                 "Ключ 'parentBMissing' отсутствует",
-            ],
-            passed: ['parent.childB', 'keyOk', 'notRequired'],
+            ].sort(),
+            passed: ['parent.childB', 'keyOk', 'notRequired'].sort(),
             byKeys: {
                 parent: false,
                 'parent.childA': false,
@@ -192,9 +192,6 @@ describe('Тестирование обработки пропущенных с�
                 notRequired: true
             },
             errorsByKeys: {
-                'keyOk': [],
-                'parent.childB': [],
-                'notRequired': [],
                 'parent.childA.childA1': ["Ключ 'parent.childA.childA1' отсутствует"],
                 'parent.childA.childA2': ["Ключ 'parent.childA.childA2' отсутствует"],
                 parentBMissing: [ "Ключ 'parentBMissing' отсутствует" ]

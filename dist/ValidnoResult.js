@@ -10,24 +10,35 @@ class ValidnoResult {
         this.errorsByKeys = (results === null || results === void 0 ? void 0 : results.errorsByKeys) || {};
         this.byKeys = (results === null || results === void 0 ? void 0 : results.byKeys) || {};
     }
-    fixByKey(key, result) {
+    setKeyStatus(key, result) {
         this.byKeys[key] = result;
-        if (result === true)
-            this.passed.push(key);
+    }
+    fixParentByChilds(parentKey, childChecks = []) {
+        const isEveryOk = childChecks.every(c => c === true);
+        this.setKeyStatus(parentKey, isEveryOk);
+        if (isEveryOk === true)
+            this.setPassed(parentKey);
         else
-            this.failed.push(key);
+            this.setFailed(parentKey);
     }
-    pushMissing(key, errMsg) {
-        this.missed.push(key);
-        this.fixByKey(key, false);
+    setMissing(key, errMsg) {
         const error = errMsg || _errors.getMissingError(key);
-        this.pushError(key, error);
+        this.missed.push(key);
+        this.setFailed(key, error);
+        this.setKeyStatus(key, false);
     }
-    pushError(key, msg) {
+    setPassed(key) {
+        this.passed.push(key);
+        this.setKeyStatus(key, true);
+    }
+    setFailed(key, msg) {
         if (key in this.errorsByKeys === false) {
             this.errorsByKeys[key] = [];
         }
-        this.byKeys[key] = false;
+        this.failed.push(key);
+        this.setKeyStatus(key, false);
+        if (!msg)
+            return;
         this.errors.push(msg);
         this.errorsByKeys[key].push(msg);
     }
@@ -50,11 +61,19 @@ class ValidnoResult {
         }
         return this;
     }
+    clearEmptyErrorsByKeys() {
+        for (const key in this.errorsByKeys) {
+            if (!this.errorsByKeys[key].length) {
+                delete this.errorsByKeys[key];
+            }
+        }
+    }
     finish() {
         if (this.failed.length)
             this.ok = false;
         else
             this.ok = true;
+        this.clearEmptyErrorsByKeys();
         return this;
     }
 }

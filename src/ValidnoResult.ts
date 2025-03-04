@@ -24,28 +24,42 @@ class ValidnoResult {
     this.byKeys = results?.byKeys || {}
   }
 
-  fixByKey(key: string, result: boolean) {
+  setKeyStatus(key: string, result: boolean) {
     this.byKeys[key] = result
-
-    if (result === true) this.passed.push(key)
-    else this.failed.push(key)
   }
 
-  pushMissing(key: string, errMsg?: string) {
-    this.missed.push(key)
-    this.fixByKey(key, false)
+  fixParentByChilds(parentKey: string, childChecks: boolean[] = []) {
+    const isEveryOk = childChecks.every(c => c === true)
+    this.setKeyStatus(parentKey, isEveryOk)
 
+    if (isEveryOk === true) this.setPassed(parentKey)
+    else this.setFailed(parentKey)
+
+  }
+
+  setMissing(key: string, errMsg?: string) {
     const error = errMsg || _errors.getMissingError(key)
 
-    this.pushError(key, error)
+    this.missed.push(key)
+    this.setFailed(key, error)
+    this.setKeyStatus(key, false)
   }
 
-  pushError(key: string, msg: string) {
+  setPassed(key: string) {
+    this.passed.push(key)
+    this.setKeyStatus(key, true)
+  }
+
+  setFailed(key: string, msg?: string) {
     if (key in this.errorsByKeys === false) {
         this.errorsByKeys[key] = []
     }
 
-    this.byKeys[key] = false
+    this.failed.push(key)
+    this.setKeyStatus(key, false)
+
+    if (!msg) return
+
     this.errors.push(msg)
     this.errorsByKeys[key].push(msg)
   }
@@ -73,12 +87,22 @@ class ValidnoResult {
     return this
   }
 
-    finish() {
-        if (this.failed.length) this.ok = false
-        else this.ok = true 
-
-        return this
+  clearEmptyErrorsByKeys() {
+    for (const key in this.errorsByKeys) {
+      if (!this.errorsByKeys[key].length) {
+        delete this.errorsByKeys[key]
+      }
     }
+  }
+
+  finish() {
+      if (this.failed.length) this.ok = false
+      else this.ok = true 
+
+      this.clearEmptyErrorsByKeys()
+
+      return this
+  }
 }
 
 export default ValidnoResult

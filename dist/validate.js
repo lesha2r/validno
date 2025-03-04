@@ -24,7 +24,7 @@ function generateMsg(input) {
 function handleDeepKey(input) {
     const { results, key, deepKey, data, reqs } = input;
     const nesctedKeys = Object.keys(reqs);
-    results.fixByKey(deepKey, false);
+    const nestedResults = [];
     let i = 0;
     while (i < nesctedKeys.length) {
         const nestedKey = nesctedKeys[i];
@@ -35,9 +35,11 @@ function handleDeepKey(input) {
             deepKey: `${deepKey}.${nestedKey}`
         };
         const deepResults = handleKey.call(this, deepParams);
+        nestedResults.push(deepResults.ok);
         results.merge(deepResults);
         i++;
     }
+    results.fixParentByChilds(deepKey, nestedResults);
     return results;
 }
 export function handleKey(input) {
@@ -52,7 +54,7 @@ export function handleKey(input) {
     const typeChecked = [];
     const rulesChecked = [];
     if (_helpers.checkNestedIsMissing(reqs, data)) {
-        results.pushMissing(deepKey);
+        results.setMissing(deepKey);
         return results;
     }
     if (hasNested) {
@@ -61,7 +63,7 @@ export function handleKey(input) {
     if (hasMissing) {
         let errMsg = generateMsg.call(this, input);
         missedCheck.push(false);
-        results.pushMissing(deepKey, errMsg);
+        results.setMissing(deepKey, errMsg);
         return results;
     }
     const typeCheck = checkType(key, data[key], reqs, deepKey);
@@ -82,12 +84,17 @@ export function handleKey(input) {
         });
     }
     if (missedCheck.length)
-        results.pushMissing(deepKey);
+        results.setMissing(deepKey);
     const isPassed = (!typeChecked.length && !rulesChecked.length && !missedCheck.length);
-    results.fixByKey(deepKey, isPassed);
-    results.errorsByKeys[deepKey] = [
-        ...results.errors
-    ];
+    if (!isPassed) {
+        results.setFailed(deepKey);
+        results.errorsByKeys[deepKey] = [
+            ...results.errors
+        ];
+    }
+    else {
+        results.setPassed(deepKey);
+    }
     return results.finish();
 }
 function validate(schema, data, keysToCheck) {

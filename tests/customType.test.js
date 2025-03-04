@@ -114,7 +114,7 @@ describe('Тестирование кастомного типа', () => {
     })
 
     test('Унаследованный класс от String не проходит проверку как String', () => {
-        const keys = ['cust1', 'cust2', 'cust3', 'cust4', 'undef']
+        const keys = ['cust0', 'cust1', 'cust2', 'cust3', 'undef']
 
         const origin = new String('str1')
         const origin2 = 'str2'
@@ -163,10 +163,13 @@ describe('Тестирование кастомного типа', () => {
             res.byKeys[keys[1]] === true,
             res.byKeys[keys[2]] === false,
             res.byKeys[keys[3]] === false,
+            res.byKeys[keys[4]] === false,
         ].every(k => k === true)
 
         expect(res.ok).toBe(false)
         expect(allKeysArePassed).toBe(true)
+        expect(res.failed.includes(keys[2])).toBe(true)
         expect(res.failed.includes(keys[3])).toBe(true)
+        expect(res.failed.includes(keys[4])).toBe(true)
     })
 })

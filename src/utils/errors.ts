@@ -14,7 +14,7 @@ _errors.getErrorDetails = (key: string, expectedType: any, receivedValue: any) =
 
 _errors.joinErrors = (errorsArr: string[], separator = '; ') => {
     return errorsArr?.join(`${separator}`) || ''
-  }
+}
 
 export default _errors
 

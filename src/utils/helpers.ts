@@ -1,6 +1,5 @@
 import { defaultSchemaKeys, TSchemaInput } from "../Schema.js"
 import { IKeyHandler } from "../validate.js"
-import ValidnoResult, { TResult } from "../ValidnoResult.js"
 import _validations from "./validations.js"
 
 const _helpers: {[key: string]: Function} = {}
@@ -64,4 +63,32 @@ _helpers.compareArrs = (v1: unknown[], v2: unknown[]) => {
   })
 }
 
+_helpers.compareObjs = (obj1: object, obj2: object) => {
+  function deepEqual(obj1: any, obj2: any) {
+    if (obj1 === obj2) {
+      return true;
+    }
+  
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) {
+      return false;
+    }
+  
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+  
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+  
+    for (let key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(obj1[key], obj2[key])) {
+        return false;
+      }
+    }
+  
+    return true;
+  }
+
+  return deepEqual(obj1, obj2)
+}
 export default _helpers

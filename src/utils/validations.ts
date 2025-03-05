@@ -91,9 +91,49 @@ _validations.isNumberGte = (value: any, gte: number) => {
   return typeof value === 'number' && value >= gte;
 };
 
+_validations.isNumberGt = (value: any, gt: number) => {
+  return typeof value === 'number' && value > gt;
+}
+
 _validations.isNumberLte = (value: any, lte: number) => {
   return typeof value === 'number' && value <= lte;
 };
+
+_validations.isNumberLt = (value: any, lt: number) => {
+  return typeof value === 'number' && value < lt;
+}
+
+_validations.isDateGte = (date1: any, date2: Date) => {
+  if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+    return false
+  }
+
+  return date1 >= date2
+}
+
+_validations.isDateGt = (date1: any, date2: Date) => {
+  if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+    return false
+  }
+
+  return date1 > date2
+}
+
+_validations.isDateLte = (date1: any, date2: Date) => {
+  if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+    return false
+  }
+
+  return date1 <= date2
+}
+
+_validations.isDateLt = (date1: any, date2: Date) => {
+  if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+    return false
+  }
+
+  return date1 < date2
+}
 
 _validations.hasKey = (obj: object, key: string) => {
   if (_validations.isObject(obj) === false) return false;
@@ -114,9 +154,7 @@ _validations.is = (value: any, compareTo: any) => {
         const bothObjects = _validations.isObject(value) && _validations.isObject(compareTo)
   
         if (bothObjects) {
-          const valueStr = JSON.stringify(value)
-          const compareToStr = JSON.stringify(compareTo)
-          return valueStr === compareToStr
+          return _helpers.compareObjs(value, compareTo)
         }
   
         const bothDates =  _validations.isDate(value) && _validations.isDate(compareTo)
@@ -131,9 +169,6 @@ _validations.is = (value: any, compareTo: any) => {
 _validations.not = (value: any, not: any) => {
   return !_validations.is(value, not)
 };
-_validations.isNot = _validations.not
-_validations.ne = _validations.not
-
 
 _validations.regexTested = (value: string, regexp: RegExp) =>{
   if (!regexp || regexp instanceof RegExp !== true) {
@@ -143,6 +178,20 @@ _validations.regexTested = (value: string, regexp: RegExp) =>{
   return regexp.test(value);
 };
 
+// Aliases
+// isNumber**
+_validations.gt = _validations.isNumberGt
+_validations.gte = _validations.isNumberGte
+_validations.lte = _validations.isNumberLte
+_validations.lt = _validations.isNumberLt
+// is
+_validations.eq = _validations.is
+// not
+_validations.isNot = _validations.not
+_validations.ne = _validations.not
+_validations.neq = _validations.not
+// regexp
+_validations.regexpTested = _validations.regexpTested
 _validations.regex = _validations.regexTested
 _validations.regexp = _validations.regexTested
 _validations.test = _validations.regexTested

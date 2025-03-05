@@ -74,8 +74,38 @@ _validations.lengthMax = (value, max) => {
 _validations.isNumberGte = (value, gte) => {
     return typeof value === 'number' && value >= gte;
 };
+_validations.isNumberGt = (value, gt) => {
+    return typeof value === 'number' && value > gt;
+};
 _validations.isNumberLte = (value, lte) => {
     return typeof value === 'number' && value <= lte;
+};
+_validations.isNumberLt = (value, lt) => {
+    return typeof value === 'number' && value < lt;
+};
+_validations.isDateGte = (date1, date2) => {
+    if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+        return false;
+    }
+    return date1 >= date2;
+};
+_validations.isDateGt = (date1, date2) => {
+    if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+        return false;
+    }
+    return date1 > date2;
+};
+_validations.isDateLte = (date1, date2) => {
+    if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+        return false;
+    }
+    return date1 <= date2;
+};
+_validations.isDateLt = (date1, date2) => {
+    if (!_validations.isDate(date1) || !_validations.isDate(date2)) {
+        return false;
+    }
+    return date1 < date2;
 };
 _validations.hasKey = (obj, key) => {
     if (_validations.isObject(obj) === false)
@@ -92,9 +122,7 @@ _validations.is = (value, compareTo) => {
     }
     const bothObjects = _validations.isObject(value) && _validations.isObject(compareTo);
     if (bothObjects) {
-        const valueStr = JSON.stringify(value);
-        const compareToStr = JSON.stringify(compareTo);
-        return valueStr === compareToStr;
+        return _helpers.compareObjs(value, compareTo);
     }
     const bothDates = _validations.isDate(value) && _validations.isDate(compareTo);
     if (bothDates) {
@@ -105,14 +133,21 @@ _validations.is = (value, compareTo) => {
 _validations.not = (value, not) => {
     return !_validations.is(value, not);
 };
-_validations.isNot = _validations.not;
-_validations.ne = _validations.not;
 _validations.regexTested = (value, regexp) => {
     if (!regexp || regexp instanceof RegExp !== true) {
         throw new Error('regexp argument is incorrect');
     }
     return regexp.test(value);
 };
+_validations.gt = _validations.isNumberGt;
+_validations.gte = _validations.isNumberGte;
+_validations.lte = _validations.isNumberLte;
+_validations.lt = _validations.isNumberLt;
+_validations.eq = _validations.is;
+_validations.isNot = _validations.not;
+_validations.ne = _validations.not;
+_validations.neq = _validations.not;
+_validations.regexpTested = _validations.regexpTested;
 _validations.regex = _validations.regexTested;
 _validations.regexp = _validations.regexTested;
 _validations.test = _validations.regexTested;

@@ -6,7 +6,6 @@ export type TSchemaItem = {
     eachType?: any,
     rules?: {},
     title?: string,
-    
     customMessage?: Function
 }
 

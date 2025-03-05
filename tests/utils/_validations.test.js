@@ -448,6 +448,44 @@ describe('Тест _validations.isNumberGte', () => {
     })
 });
 
+describe('Тест _validations.isNumberGt', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isNumberGt(1)
+        const res2 = _validations.isNumberGt()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const values = [
+            1,
+            2,
+            3
+        ]
+
+        const isEveryFalse = checkEveryValue(values, (v) => {
+            return _validations.isNumberGt(v, 3)
+        }, false)
+
+        expect(isEveryFalse).toBe(true)
+        
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const values = [
+            4,
+            5,
+            6
+        ]
+        const isEveryTrue = checkEveryValue(values, (v) => {
+            return _validations.isNumberGt(v, 3)
+        }, true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+});
+
 describe('Тест _validations.isNumberLte', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
         const res1 = _validations.isNumberLte(1)
@@ -479,6 +517,48 @@ describe('Тест _validations.isNumberLte', () => {
         const isEveryTrue = checkEveryValue(values, (v) => _validations.isNumberLte(v, 3), true)
 
         expect(isEveryTrue).toBe(true)
+    })
+
+    test('Тест алиасов', () => {
+        expect(_validations.lte === _validations.isNumberLte).toBe(true)
+    })
+});
+
+describe('Тест _validations.isNumberLt', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isNumberLt(1)
+        const res2 = _validations.isNumberLt()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const values = [
+            4,
+            5,
+            6
+        ]
+
+        const isEveryFalse = checkEveryValue(values, (v) => _validations.isNumberLt(v, 4), false)
+
+        expect(isEveryFalse).toBe(true)
+        
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const values = [
+            1,
+            2,
+            3
+        ]
+        const isEveryTrue = checkEveryValue(values, (v) => _validations.isNumberLt(v, 4), true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+
+    test('Тест алиасов', () => {
+        expect(_validations.lt === _validations.isNumberLt).toBe(true)
     })
 });
 
@@ -586,6 +666,10 @@ describe('Тест _validations.is', () => {
         expect(results.obj).toBe(true)
         expect(results.dates).toBe(true)
     })
+
+    test('Тест алиасов', () => {
+        expect(_validations.eq === _validations.is).toBe(true)
+    })
 });
 
 describe('Тест _validations.not', () => {
@@ -649,7 +733,9 @@ describe('Тест _validations.not', () => {
     })
 
     test('Тест алиасов', () => {
-        expect(_validations.not === _validations.isNot).toBe(true)
+        expect(_validations.isNot === _validations.not).toBe(true)
+        expect(_validations.ne === _validations.not).toBe(true)
+        expect(_validations.neq === _validations.not).toBe(true)
     })
 });
 
@@ -698,5 +784,179 @@ describe('Тест _validations.regexp', () => {
         expect(_validations.regexp === _validations.regexTested).toBe(true)
         expect(_validations.regex === _validations.regexTested).toBe(true)
         expect(_validations.test === _validations.regexTested).toBe(true)
+    })
+});
+
+describe('Тест _validations.isDateLte', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isDateLte(new Date())
+        const res2 = _validations.isDateLte()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const now = new Date()
+
+        const values = [
+            new Date('2029-01-01'),
+            new Date('2123-01-01'),
+            new Date('2050-05-05')
+        ]
+
+        expect(_validations.isDateLte(values[0], now)).toBe(false)
+        expect(_validations.isDateLte(values[1], now)).toBe(false)
+        expect(_validations.isDateLte(values[2], now)).toBe(false)
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const now = new Date()
+        const now2 = new Date(now)
+        const nowMinusMin = new Date()
+        nowMinusMin.setMinutes(now.getMinutes() - 1)
+
+        const values = [
+            new Date('2020-01-01'),
+            new Date('2024-01-01'),
+            new Date('1990-01-01'),
+            nowMinusMin,
+            now2
+        ]
+        expect(_validations.isDateLte(values[0], now)).toBe(true)
+        expect(_validations.isDateLte(values[1], now)).toBe(true)
+        expect(_validations.isDateLte(values[2], now)).toBe(true)
+        expect(_validations.isDateLte(values[3], now)).toBe(true)
+        expect(_validations.isDateLte(values[4], now)).toBe(true)
+    })
+});
+
+describe('Тест _validations.isDateLt', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isDateLt(new Date())
+        const res2 = _validations.isDateLt()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const now = new Date()
+        const now2 = new Date(now)
+
+        const values = [
+            new Date('2029-01-01'),
+            new Date('2123-01-01'),
+            new Date('2050-05-05')
+        ]
+
+        expect(_validations.isDateLt(values[0], now)).toBe(false)
+        expect(_validations.isDateLt(values[1], now)).toBe(false)
+        expect(_validations.isDateLt(values[2], now)).toBe(false)
+        expect(_validations.isDateLt(now2, now)).toBe(false)
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const now = new Date()
+        const nowMinusMin = new Date()
+        nowMinusMin.setMinutes(now.getMinutes() - 1)
+
+        const values = [
+            new Date('2020-01-01'),
+            new Date('2024-01-01'),
+            new Date('1990-01-01'),
+            nowMinusMin,
+        ]
+        expect(_validations.isDateLt(values[0], now)).toBe(true)
+        expect(_validations.isDateLt(values[1], now)).toBe(true)
+        expect(_validations.isDateLt(values[2], now)).toBe(true)
+        expect(_validations.isDateLt(values[3], now)).toBe(true)
+    })
+});
+
+describe('Тест _validations.isDateGte', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isDateGte(new Date())
+        const res2 = _validations.isDateGte()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const now = new Date()
+
+        const values = [
+            new Date('2029-01-01'),
+            new Date('2123-01-01'),
+            new Date('2050-05-05')
+        ]
+
+        expect(_validations.isDateGte(now, values[0])).toBe(false)
+        expect(_validations.isDateGte(now, values[1])).toBe(false)
+        expect(_validations.isDateGte(now, values[2])).toBe(false)
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const now = new Date()
+        const now2 = new Date(now)
+        const nowMinusMin = new Date()
+        nowMinusMin.setMinutes(now.getMinutes() - 1)
+
+        const values = [
+            new Date('2020-01-01'),
+            new Date('2024-01-01'),
+            new Date('1990-01-01'),
+            nowMinusMin,
+            now2
+        ]
+        expect(_validations.isDateGte(now, values[0])).toBe(true)
+        expect(_validations.isDateGte(now, values[1])).toBe(true)
+        expect(_validations.isDateGte(now, values[2])).toBe(true)
+        expect(_validations.isDateGte(now, values[3])).toBe(true)
+        expect(_validations.isDateGte(now, values[4])).toBe(true)
+    })
+});
+
+describe('Тест _validations.isDateLt', () => {
+    test('Отсутствие аргументов вызывает ответ false', () => {
+        const res1 = _validations.isDateLt(new Date())
+        const res2 = _validations.isDateLt()
+
+        expect(res1).toBe(false)
+        expect(res2).toBe(false)
+    })
+
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const now = new Date()
+        const now2 = new Date(now)
+
+        const values = [
+            new Date('2021-01-01'),
+            new Date('2024-01-01'),
+            new Date('2000-01-01')
+        ]
+
+        expect(_validations.isDateGt(values[0], now)).toBe(false)
+        expect(_validations.isDateGt(values[1], now)).toBe(false)
+        expect(_validations.isDateGt(values[2], now)).toBe(false)
+        expect(_validations.isDateGt(now2, now)).toBe(false)
+    })
+
+    test('Корректные значения проходят проверку', () => {
+        const now = new Date()
+        const nowPlusMin = new Date()
+        nowPlusMin.setMinutes(now.getMinutes() + 1)
+
+        const values = [
+            new Date('2030-01-01'),
+            new Date('2029-01-01'),
+            new Date('2100-12-31'),
+            nowPlusMin,
+        ]
+        expect(_validations.isDateGt(values[0], now)).toBe(true)
+        expect(_validations.isDateGt(values[1], now)).toBe(true)
+        expect(_validations.isDateGt(values[2], now)).toBe(true)
+        expect(_validations.isDateGt(values[3], now)).toBe(true)
     })
 });

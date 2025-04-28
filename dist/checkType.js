@@ -2,22 +2,26 @@ import { ErrorKeywords } from "./constants/details.js";
 import _validations from "./utils/validations.js";
 import _errors from "./utils/errors.js";
 const checkTypeMultiple = (key, value, requirements, keyName = key) => {
-    const constructorNames = requirements.type.map((el) => String((el === null || el === void 0 ? void 0 : el.name) || el));
+    const constructorNames = Array.isArray(requirements.type)
+        ? requirements.type.map((el) => String((el === null || el === void 0 ? void 0 : el.name) || el))
+        : [];
     const result = {
         key: keyName,
         passed: false,
         details: _errors.getErrorDetails(keyName, constructorNames.join('/'), value)
     };
     let i = 0;
-    while (i < requirements.type.length) {
-        const requirementsRe = Object.assign(Object.assign({}, requirements), { type: requirements.type[i] });
-        const check = checkType(key, value, requirementsRe);
-        if (check[0].passed === true) {
-            result.passed = true;
-            result.details = 'OK';
-            return result;
+    if (Array.isArray(requirements.type)) {
+        while (i < requirements.type.length) {
+            const requirementsRe = Object.assign(Object.assign({}, requirements), { type: requirements.type[i] });
+            const check = checkType(key, value, requirementsRe);
+            if (check[0].passed === true) {
+                result.passed = true;
+                result.details = 'OK';
+                return result;
+            }
+            i++;
         }
-        i++;
     }
     return result;
 };
@@ -149,8 +153,8 @@ const checkType = (key, value, requirements, keyName = key) => {
             });
             break;
         default:
-            const isInstanceOf = value instanceof typeBySchema;
-            const isConstructorSame = ((_a = value.constructor) === null || _a === void 0 ? void 0 : _a.name) === (typeBySchema === null || typeBySchema === void 0 ? void 0 : typeBySchema.name);
+            const isInstanceOf = typeof typeBySchema === 'function' && value instanceof typeBySchema;
+            const isConstructorSame = typeof typeBySchema === 'function' && ((_a = value.constructor) === null || _a === void 0 ? void 0 : _a.name) === (typeBySchema === null || typeBySchema === void 0 ? void 0 : typeBySchema.name);
             const checked = isInstanceOf && isConstructorSame;
             result.push({
                 key: keyName,

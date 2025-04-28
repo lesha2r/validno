@@ -1,18 +1,14 @@
+import { ESchemaFields } from "./constants/schema.js";
 import validate from "./validate.js";
-export const defaultSchemaKeys = [
-    "required",
-    "type",
-    "eachType",
-    "rules",
-    "title",
-    "customMessage",
-    "joinErrors"
-];
+export const defaultSchemaKeys = Object.values(ESchemaFields);
 export class Schema {
-    constructor(inputSchema) {
-        this.schema = inputSchema;
+    constructor(inputSchemaDefinition) {
+        if (!inputSchemaDefinition || typeof inputSchemaDefinition !== 'object') {
+            throw new Error("Invalid schema input");
+        }
+        this.schema = inputSchemaDefinition;
     }
-    validate(data, keys) {
-        return validate.call(this, this, data, keys);
+    validate(inputData, validationKeys) {
+        return validate.call(this, inputData, validationKeys);
     }
 }

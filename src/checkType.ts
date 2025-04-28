@@ -3,9 +3,15 @@ import { TSchemaInput, TSchemaItem } from "./Schema.js";
 import _validations from "./utils/validations.js";
 import _errors from "./utils/errors.js";
 
-
-const checkTypeMultiple = (key: string, value: any, requirements: TSchemaItem | TSchemaInput, keyName = key) => {
-  const constructorNames = requirements.type.map((el:any) => String(el?.name || el))
+const checkTypeMultiple = (
+  key: string,
+  value: unknown,
+  requirements: TSchemaItem | TSchemaInput,
+  keyName = key
+) => {
+  const constructorNames = Array.isArray(requirements.type) 
+    ? requirements.type.map((el: any) => String(el?.name || el)) 
+    : [];
   
   const result = {
     key: keyName,
@@ -14,17 +20,18 @@ const checkTypeMultiple = (key: string, value: any, requirements: TSchemaItem | 
   };
 
   let i = 0;
-  while (i < requirements.type.length) {
-    const requirementsRe = { ...requirements, type: requirements.type[i]}
-    const check = checkType(key, value, requirementsRe)
+  if (Array.isArray(requirements.type)) {
+    while (i < requirements.type.length) {
+      const requirementsRe = { ...requirements, type: requirements.type[i]}
+      const check = checkType(key, value, requirementsRe)
 
-    if (check[0].passed === true) {
-      result.passed = true
-      result.details = 'OK'
-      return result
+      if (check[0].passed === true) {
+        result.passed = true
+        result.details = 'OK'
+        return result
+      }
+      i++;
     }
-
-    i++
   }
 
   return result
@@ -73,7 +80,7 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
   
     const getDetails = (isOK: boolean) => isOK ? 'OK' : customErrDetails || baseErrDetails
 
-      const typeBySchema = requirements.type
+    const typeBySchema = requirements.type
 
     switch (typeBySchema) {
       case 'any':
@@ -189,8 +196,8 @@ const checkType = (key: string, value: any, requirements: TSchemaItem | TSchemaI
 
         break;
       default:
-        const isInstanceOf = value instanceof typeBySchema
-        const isConstructorSame = value.constructor?.name === typeBySchema?.name
+        const isInstanceOf = typeof typeBySchema === 'function' && value instanceof typeBySchema
+        const isConstructorSame = typeof typeBySchema === 'function' && value.constructor?.name === typeBySchema?.name
         const checked = isInstanceOf && isConstructorSame
 
         result.push({

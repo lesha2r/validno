@@ -4,164 +4,207 @@ import checkRules from "./checkRules.js";
 import _helpers from "./utils/helpers.js";
 import _validations from "./utils/validations.js";
 import { ErrorKeywords } from "./constants/details.js";
-import { Schema, TSchemaInput } from "./Schema.js";
-import ValidnoResult, { TResult } from "./ValidnoResult.js";
+import { Schema, TSchema, TSchemaInput } from "./Schema.js";
+import ValidnoResult from "./ValidnoResult.js";
 
 export interface IKeyHandler {
   results: ValidnoResult,
   key: string,
   data: any,
   reqs: TSchemaInput,
-  deepKey: string
+  nestedKey: string
 }
 
-function generateMsg(this: any, input: IKeyHandler) {
-  let {key, deepKey, data, reqs} = input
+function handleMissingKey(schema: TSchema, input: IKeyHandler) {
+  const { key, nestedKey, data, reqs } = input;
 
-  const keyForMsg = deepKey || key
-  const keyTitle = 'title' in reqs ? reqs.title : keyForMsg
+  const messageKey = nestedKey || key;
+  const messageTitle = reqs.title || messageKey;
 
-  if (!reqs.customMessage)   return _errors.getMissingError(keyForMsg)
-
-  // @ts-ignore
-  const errMsg = reqs.customMessage({
-    keyword: ErrorKeywords.Missing,
-    value: data[key],
-    key: keyForMsg,
-    title: keyTitle,
-    reqs: reqs,
-    schema: this.schema
-  })
-
-  return errMsg
-}
-
-function handleDeepKey(
-  this: any,
-  input: IKeyHandler
-) {
-  const {results, key, deepKey, data, reqs} = input
-
-  const nesctedKeys: string[] = Object.keys(reqs)
-  const nestedResults: boolean[] = []
-
-  let i = 0;
-  while (i < nesctedKeys.length) {
-    const nestedKey: string = nesctedKeys[i]
-
-    const deepParams: IKeyHandler = {
-      key: nestedKey,
-      data: data[key],
-      // @ts-ignore
-      reqs: reqs[nestedKey],
-      deepKey: `${deepKey}.${nestedKey}`
-    }
-
-    const deepResults = handleKey.call(this, deepParams)
-    nestedResults.push(deepResults.ok!)
-    results.merge(deepResults)
-
-    i++
+  if (!reqs.customMessage) {
+    return _errors.getMissingError(messageKey);
   }
 
-  results.fixParentByChilds(deepKey, nestedResults)
+  // @ts-ignore
+  const errorMessage = reqs.customMessage({
+    keyword: ErrorKeywords.Missing,
+    value: data[key],
+    key: messageKey,
+    title: messageTitle,
+    reqs,
+    schema,
+  });
+
+  return errorMessage;
+}
+
+function validateNestedKey(this: any, input: IKeyHandler) {
+  const { results, key, nestedKey, data, reqs } = input;
+
+  const nestedKeys = Object.keys(reqs);
+  const nestedResults: boolean[] = [];
+
+  for (const itemKey of nestedKeys) {
+    const deepParams: IKeyHandler = {
+      key: itemKey,
+      data: data[key],
+      // @ts-ignore
+      reqs: reqs[itemKey],
+      nestedKey: `${nestedKey}.${itemKey}`
+    }
+
+    const deepResults = validateKey.call(this, deepParams)
+    nestedResults.push(deepResults.ok!)
+    results.merge(deepResults)
+  }
+
+  results.fixParentByChilds(nestedKey, nestedResults)
 
   return results
 }
 
-export function handleKey(
-  this: any,
-  input: IKeyHandler
-) {
-    let {results, key, deepKey, data, reqs} = input
+function validateKey(this: any, input: IKeyHandler) {
+  let { results, key, nestedKey, data, reqs } = input;
 
-    if (!results) results = new ValidnoResult()
-    if (!deepKey) deepKey = key
+  if (!results) results = new ValidnoResult();
+  if (!nestedKey) nestedKey = key;
 
-    const hasNested = _helpers.checkIsNested(reqs)
-    const hasMissing = _helpers.hasMissing(input)
+  const hasMissing = _helpers.hasMissing(input);
 
-    const missedCheck: boolean[] = [];
-    const typeChecked: boolean[] = [];
-    const rulesChecked: boolean[] = [];
+  if (_helpers.checkNestedIsMissing(reqs, data)) {
+    return handleMissingNestedKey(results, nestedKey);
+  }
 
-    // If nested key is present but no data provided
-    if (_helpers.checkNestedIsMissing(reqs, data)) {
-      results.setMissing(deepKey)
-      return results
-    }
+  if (_helpers.checkIsNested(reqs)) {
+    return validateNestedKey.call(this, { results, key, data, reqs, nestedKey });
+  }
 
-    // Handle nested keys first
-    if (hasNested) {
-      return handleDeepKey.call(this, {results, key, data, reqs, deepKey})
-    }
-
-    // Check missing keys
-    if (hasMissing) {
-      let errMsg = generateMsg.call(this, input)
-
-      missedCheck.push(false)
-      results.setMissing(deepKey, errMsg)
-
-      return results
-    }
-
-    // Check value type
-    const typeCheck = checkType(key, data[key], reqs, deepKey);
-    typeCheck.forEach(res => {
-      if (res.passed === false) {
-        typeChecked.push(res.passed)
-        results.errors.push(res.details)
-      }
-    })
-
-    // Check all rules
-    // @ts-ignore
-    const ruleCheck = checkRules.call(this, deepKey, data[key], reqs, data);
-
-    if (!ruleCheck.ok) {
-      rulesChecked.push(false)
-      ruleCheck.details.forEach((el) => {
-        if (deepKey in results.errorsByKeys) results.errorsByKeys[deepKey] = []
-
-        results.errors.push(el)
-        results.errorsByKeys[deepKey] = ['1']
-      })
-    }
-
-    // Combine final result
-    if (missedCheck.length) results.setMissing(deepKey)
-    
-    const isPassed = (!typeChecked.length && !rulesChecked.length && !missedCheck.length)
-
-    if (!isPassed) {
-      results.setFailed(deepKey)
-
-      results.errorsByKeys[deepKey] = [
-        ...results.errors
-      ]
-    } else {
-      results.setPassed(deepKey)
-    }
-
-    return results.finish()
+  // Validate key
+  return validateKeyDetails.call(this, {
+    results,
+    key,
+    nestedKey,
+    data,
+    reqs,
+    hasMissing,
+  });
 }
 
-function validate(
-  schema: Schema,
-  data: unknown,
+function handleMissingNestedKey(results: ValidnoResult, nestedKey: string) {
+  results.setMissing(nestedKey);
+  return results;
+}
+
+function validateKeyDetails(this: any, params: {
+  results: ValidnoResult;
+  key: string;
+  nestedKey: string;
+  data: any;
+  reqs: TSchemaInput;
+  hasMissing: boolean;
+}) {
+  const { results, key, nestedKey, data, reqs, hasMissing } = params;
+
+  const missedCheck: boolean[] = [];
+  const typeChecked: boolean[] = [];
+  const rulesChecked: boolean[] = [];
+
+  if (hasMissing) {
+    return handleMissingKeyValidation(this.schema, { results, key, nestedKey, data, reqs }, missedCheck);
+  }
+
+  checkValueType(results, key, data[key], reqs, nestedKey, typeChecked);
+  checkRulesForKey.call(this, results, nestedKey, data[key], reqs, data, rulesChecked);
+  return finalizeValidation(results, nestedKey, missedCheck, typeChecked, rulesChecked);
+}
+
+function handleMissingKeyValidation(
+  schema: TSchema,
+  params: { results: ValidnoResult; key: string; nestedKey: string; data: any; reqs: TSchemaInput },
+  missedCheck: boolean[]
+) {
+  const { results, key, nestedKey, data, reqs } = params;
+  // @ts-ignore
+  const errMsg = handleMissingKey(schema, { key, nestedKey, data, reqs });
+  missedCheck.push(false);
+  results.setMissing(nestedKey, errMsg);
+  return results;
+}
+
+function checkValueType(
+  results: ValidnoResult,
+  key: string,
+  value: any,
+  reqs: TSchemaInput,
+  nestedKey: string,
+  typeChecked: boolean[]
+) {
+  const typeCheck = checkType(key, value, reqs, nestedKey);
+  typeCheck.forEach((res) => {
+    if (!res.passed) {
+      typeChecked.push(false);
+      results.errors.push(res.details);
+    }
+  });
+}
+
+function checkRulesForKey(
+  this: any,
+  results: ValidnoResult,
+  nestedKey: string,
+  value: any,
+  reqs: TSchemaInput,
+  data: any,
+  rulesChecked: boolean[]
+) {
+  // @ts-ignore
+  const ruleCheck = checkRules.call(this, nestedKey, value, reqs, data);
+
+  if (!ruleCheck.ok) {
+    rulesChecked.push(false);
+    ruleCheck.details.forEach((el) => {
+      if (!(nestedKey in results.errorsByKeys)) results.errorsByKeys[nestedKey] = [];
+      results.errors.push(el);
+      results.errorsByKeys[nestedKey] = ['1'];
+    });
+  }
+}
+
+function finalizeValidation(
+  results: ValidnoResult,
+  nestedKey: string,
+  missedCheck: boolean[],
+  typeChecked: boolean[],
+  rulesChecked: boolean[]
+) {
+  if (missedCheck.length) results.setMissing(nestedKey);
+
+  const isPassed = !typeChecked.length && !rulesChecked.length && !missedCheck.length;
+
+  if (!isPassed) {
+    results.setFailed(nestedKey);
+    results.errorsByKeys[nestedKey] = [...results.errors];
+  } else {
+    results.setPassed(nestedKey);
+  }
+
+  return results.finish();
+}
+
+function validateSchema(
+  this: Schema,
+  data: Record<string, unknown>,
   keysToCheck?: string | string[]
 ): ValidnoResult {
     const output = new ValidnoResult()
     const hasKeysToCheck = _helpers.areKeysLimited(keysToCheck)
-    const schemaKeys = Object.entries(schema.schema)
+    const schemaKeys = Object.entries(this.schema)
 
     for (const [key, reqs] of schemaKeys) {
       const toBeValidated = _helpers.needValidation(key, hasKeysToCheck, keysToCheck)
       if (!toBeValidated) continue
         
-      // @ts-ignore
-      const keyResult = handleKey.call(this, {key, data, reqs})
+      const keyResult = validateKey.call(this, {key, data, reqs} as IKeyHandler)
       output.merge(keyResult)
     }
   
@@ -169,4 +212,4 @@ function validate(
     return output
 };
 
-export default validate;
+export default validateSchema;

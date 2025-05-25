@@ -2,3 +2,4 @@ src
 tests
 jest.config.ts
 .eslintrc.*
+todos.md

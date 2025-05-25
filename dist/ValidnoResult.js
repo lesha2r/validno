@@ -9,6 +9,10 @@ class ValidnoResult {
         this.byKeys = (results === null || results === void 0 ? void 0 : results.byKeys) || {};
         this.errorsByKeys = (results === null || results === void 0 ? void 0 : results.errorsByKeys) || {};
     }
+    setNoData() {
+        this.ok = false;
+        this.errors = ['Отсутствует объект для проверки'];
+    }
     setKeyStatus(key, result) {
         this.byKeys[key] = result;
     }
@@ -68,7 +72,7 @@ class ValidnoResult {
         }
     }
     finish() {
-        if (this.failed.length)
+        if (this.failed.length || this.errors.length)
             this.ok = false;
         else
             this.ok = true;

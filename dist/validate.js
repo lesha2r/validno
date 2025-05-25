@@ -41,6 +41,12 @@ function validateNestedKey(input) {
 }
 function validateKey(input) {
     let { results, key, nestedKey, data, reqs } = input;
+    if (data === undefined) {
+        const noDataResult = new ValidnoResult();
+        noDataResult.setNoData();
+        noDataResult.finish();
+        return noDataResult;
+    }
     if (!results)
         results = new ValidnoResult();
     if (!nestedKey)

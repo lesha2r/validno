@@ -23,6 +23,11 @@ class ValidnoResult {
     this.errorsByKeys = results?.errorsByKeys || {}
   }
 
+  setNoData() {
+    this.ok = false;
+    this.errors = ['Отсутствует объект для проверки']
+  }
+
   setKeyStatus(key: string, result: boolean) {
     this.byKeys[key] = result
   }
@@ -95,7 +100,7 @@ class ValidnoResult {
   }
 
   finish() {
-      if (this.failed.length) this.ok = false
+      if (this.failed.length || this.errors.length) this.ok = false
       else this.ok = true 
 
       this.clearEmptyErrorsByKeys()

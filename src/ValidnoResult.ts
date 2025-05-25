@@ -119,6 +119,10 @@ class ValidnoResult {
       errorsByKeys:this.errorsByKeys,
     }
   }
+
+  isValid() {
+    return this.ok === true
+  }
 }
 
 export default ValidnoResult

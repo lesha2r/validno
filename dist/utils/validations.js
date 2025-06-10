@@ -32,7 +32,7 @@ _validations.isNullOrUndefined = (value) => {
     return value === undefined || value === null;
 };
 _validations.isEmail = (value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(value);
 };
 _validations.isDateYYYYMMDD = (value) => {
@@ -147,7 +147,6 @@ _validations.eq = _validations.is;
 _validations.isNot = _validations.not;
 _validations.ne = _validations.not;
 _validations.neq = _validations.not;
-_validations.regexpTested = _validations.regexpTested;
 _validations.regex = _validations.regexTested;
 _validations.regexp = _validations.regexTested;
 _validations.test = _validations.regexTested;

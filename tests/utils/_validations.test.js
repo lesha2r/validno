@@ -212,15 +212,40 @@ describe('Тест _validations.isNullOrUndefined', () => {
 });
 
 describe('Тест _validations.isEmail', () => {
-    test('Некорректные значения не проходят проверку', () => {
+    test('Некорректные типы значений не проходят проверку', () => {
         const values = TypesAndValues.getValuesExcept([])
         const isEveryFalse = checkEveryValue(values, _validations.isEmail, false)
 
         expect(isEveryFalse).toBe(true)
     })
 
+    test('Некорректные значения строк с email не проходят проверку', () => {
+        const values = [
+            'nameemail.com',
+            'name@.com',
+            'name@com',
+            'name@com.',
+            'name@com..',
+            'name@com..com',
+            'name@com..com.',
+            'name@com..com..',
+            'name@com..com..com',
+            'name@com..com..com.',     
+        ]
+
+        const isEveryFalse = checkEveryValue(values, _validations.isEmail, false)
+        expect(isEveryFalse).toBe(true)
+    })
+
     test('Корректные значения проходят проверку', () => {
-        const values = ['name@email.com']
+        const values = [
+            'name@email.com',
+            'name+alias@email.com',
+            'name@email.com.ru',
+            'name+alias@email.com.ru',
+            'name.surname@email.com',
+            '1234567890@email.com'
+        ]
         const isEveryTrue = checkEveryValue(values, _validations.isEmail, true)
 
         expect(isEveryTrue).toBe(true)

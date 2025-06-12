@@ -47,7 +47,8 @@ _validations.isNullOrUndefined = (value: string) => {
 
 // STRING FORMAT ::::::::::::::::::::::::::::::::::::::::::
 _validations.isEmail = (value: string) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^(?!.*\.\.)[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   return emailRegex.test(value);
 };
 

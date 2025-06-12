@@ -129,7 +129,7 @@ type TRulesResult = {
     details: string[]
 } 
 
-function checkRules (this: any, key: string, value: any, requirements: TSchemaItem, inputObj: any) {
+function validateRules (this: any, key: string, value: any, requirements: TSchemaItem, inputObj: any) {
     const result: TRulesResult = {
         ok: true,
         details: []
@@ -192,4 +192,4 @@ function checkRules (this: any, key: string, value: any, requirements: TSchemaIt
     return result;
   };
 
-  export default checkRules
+  export default validateRules

@@ -110,7 +110,7 @@ const rulesFunctions = {
         return output;
     }
 };
-function checkRules(key, value, requirements, inputObj) {
+function validateRules(key, value, requirements, inputObj) {
     const result = {
         ok: true,
         details: []
@@ -156,4 +156,4 @@ function checkRules(key, value, requirements, inputObj) {
     return result;
 }
 ;
-export default checkRules;
+export default validateRules;

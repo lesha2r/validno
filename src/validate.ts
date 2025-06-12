@@ -1,9 +1,9 @@
-import checkType from "./checkType.js";
+import checkType from "./validateType.js";
 import _errors from "./utils/errors.js";
-import checkRules from "./checkRules.js";
+import checkRules from "./validateRules.js";
 import _helpers from "./utils/helpers.js";
 import _validations from "./utils/validations.js";
-import { ErrorKeywords } from "./constants/details.js";
+import { EValidationId } from "./constants/details.js";
 import { Schema, TSchema, TSchemaInput } from "./Schema.js";
 import ValidnoResult from "./ValidnoResult.js";
 
@@ -27,7 +27,7 @@ function handleMissingKey(schema: TSchema, input: IKeyHandler) {
 
   // @ts-ignore
   const errorMessage = reqs.customMessage({
-    keyword: ErrorKeywords.Missing,
+    keyword: EValidationId.Missing,
     value: data[key],
     key: messageKey,
     title: messageTitle,
@@ -151,7 +151,7 @@ function checkValueType(
   typeCheck.forEach((res) => {
     if (!res.passed) {
       typeChecked.push(false);
-      results.errors.push(res.details);
+      results.errors.push(res.details || '');
     }
   });
 }

@@ -1,8 +1,8 @@
-import checkType from "./checkType.js";
+import checkType from "./validateType.js";
 import _errors from "./utils/errors.js";
-import checkRules from "./checkRules.js";
+import checkRules from "./validateRules.js";
 import _helpers from "./utils/helpers.js";
-import { ErrorKeywords } from "./constants/details.js";
+import { EValidationId } from "./constants/details.js";
 import ValidnoResult from "./ValidnoResult.js";
 function handleMissingKey(schema, input) {
     const { key, nestedKey, data, reqs } = input;
@@ -12,7 +12,7 @@ function handleMissingKey(schema, input) {
         return _errors.getMissingError(messageKey);
     }
     const errorMessage = reqs.customMessage({
-        keyword: ErrorKeywords.Missing,
+        keyword: EValidationId.Missing,
         value: data[key],
         key: messageKey,
         title: messageTitle,
@@ -95,7 +95,7 @@ function checkValueType(results, key, value, reqs, nestedKey, typeChecked) {
     typeCheck.forEach((res) => {
         if (!res.passed) {
             typeChecked.push(false);
-            results.errors.push(res.details);
+            results.errors.push(res.details || '');
         }
     });
 }

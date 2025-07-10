@@ -17,12 +17,14 @@ class ValidnoResult {
         this.byKeys[key] = result;
     }
     fixParentByChilds(parentKey, childChecks = []) {
-        const isEveryOk = childChecks.every(c => c === true);
+        const isEveryOk = childChecks.every(check => check === true);
         this.setKeyStatus(parentKey, isEveryOk);
-        if (isEveryOk === true)
+        if (isEveryOk) {
             this.setPassed(parentKey);
-        else
+        }
+        else {
             this.setFailed(parentKey);
+        }
     }
     setMissing(key, errMsg) {
         const error = errMsg || _errors.getMissingError(key);
@@ -35,7 +37,7 @@ class ValidnoResult {
         this.setKeyStatus(key, true);
     }
     setFailed(key, msg) {
-        if (key in this.errorsByKeys === false) {
+        if (!(key in this.errorsByKeys)) {
             this.errorsByKeys[key] = [];
         }
         this.failed.push(key);
@@ -55,8 +57,9 @@ class ValidnoResult {
         this.passed = [...this.passed, ...resultsNew.passed];
         this.byKeys = Object.assign(Object.assign({}, this.byKeys), resultsNew.byKeys);
         for (const key in resultsNew.errorsByKeys) {
-            if (key in this.errorsByKeys === false)
+            if (!(key in this.errorsByKeys)) {
                 this.errorsByKeys[key] = [];
+            }
             this.errorsByKeys[key] = [
                 ...this.errorsByKeys[key],
                 ...resultsNew.errorsByKeys[key]
@@ -72,10 +75,12 @@ class ValidnoResult {
         }
     }
     finish() {
-        if (this.failed.length || this.errors.length)
+        if (this.failed.length || this.errors.length) {
             this.ok = false;
-        else
+        }
+        else {
             this.ok = true;
+        }
         this.clearEmptyErrorsByKeys();
         return this;
     }

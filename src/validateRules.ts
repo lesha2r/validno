@@ -1,5 +1,6 @@
 import _validations from "./utils/validations.js"
-import { SchemaItem, Schema } from "./Schema.js";
+import { Schema } from "./Schema.js";
+import { FieldSchema } from "./types/common.js";
 
 export type Rule = Record<string, any>
 
@@ -129,7 +130,7 @@ type RuleCheckResult = {
     details: string[]
 } 
 
-function validateRules (this: any, key: string, value: any, requirements: SchemaItem, inputObj: any) {
+function validateRules (this: any, key: string, value: any, requirements: FieldSchema, inputObj: any) {
     const result: RuleCheckResult = {
         ok: true,
         details: []

@@ -1,5 +1,5 @@
-import { SchemaFields } from "./constants/schema.js";
 import validate from "./validate.js";
+import { SchemaFields } from "./constants/schema.js";
 export const defaultSchemaKeys = Object.values(SchemaFields);
 export class Schema {
     constructor(inputSchemaDefinition) {

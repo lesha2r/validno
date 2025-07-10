@@ -1,8 +1,5 @@
 import { ValidationDetails } from "../constants/details.js"
 
-/**
- * Result type for checkType
- */
 export type TypeValidationResult = {
   key: string;
   passed: boolean;
@@ -10,9 +7,6 @@ export type TypeValidationResult = {
 }
 
 const _validateType = {
-  /**
-   * Helper function to create a check result object
-   */
   getResult: (
     key: string,
     passed: boolean,

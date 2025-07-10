@@ -19,9 +19,10 @@ import { ValidationDetails, ValidationIds } from "./constants/details.js";
 import _validations from "./utils/validations.js";
 import _errors from "./utils/errors.js";
 import _validateType, { TypeValidationResult } from "./utils/validateType.js";
+import { SchemaDefinition, FieldSchema } from "./types/common.js";
 
 // TYPES
-import { SchemaInput, SchemaItem } from "./Schema.js";
+
 
 /**
  * Checks value against multiple possible types.
@@ -30,7 +31,7 @@ import { SchemaInput, SchemaItem } from "./Schema.js";
 const validateUnionType = (
   key: string,
   value: unknown,
-  requirements: SchemaItem,
+  requirements: FieldSchema,
   keyName = key
 ): TypeValidationResult => {
   const typeList: string[] = Array.isArray(requirements.type)
@@ -64,7 +65,7 @@ const validateUnionType = (
  * Main type validation function.
  * Validates a value against a single type or multiple types defined in schema.
  */
-const validateType = (key: string, value: unknown, requirements: SchemaItem | SchemaInput, keyName = key): TypeValidationResult[] => {
+const validateType = (key: string, value: unknown, requirements: FieldSchema | SchemaDefinition, keyName = key): TypeValidationResult[] => {
   const isNotNull = value !== null
   const keyTitle = 'title' in requirements ? requirements.title : keyName
   const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function'
@@ -75,7 +76,7 @@ const validateType = (key: string, value: unknown, requirements: SchemaItem | Sc
 
   // Handle case of multiple types like [String, Number]
   if (Array.isArray(requirements.type)) {
-    return [validateUnionType(key, value, requirements as SchemaItem)]
+    return [validateUnionType(key, value, requirements as FieldSchema)]
   }
 
   if (value === undefined && requirements.required !== true) {

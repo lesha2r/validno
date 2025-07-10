@@ -1,6 +1,7 @@
 import _validations from "./validations.js"
-import { defaultSchemaKeys, SchemaInput } from "../Schema.js"
+import { defaultSchemaKeys } from "../Schema.js"
 import { KeyValidationDetails } from "../validate.js"
+import { SchemaDefinition } from "../types/common.js"
 
 
 const _helpers: {[key: string]: Function} = {}
@@ -17,7 +18,7 @@ _helpers.checkIsNested = (obj: {[key: string]: any}) => {
   }
 }
 
-_helpers.checkNestedIsMissing = (reqs: SchemaInput, data: any) => {
+_helpers.checkNestedIsMissing = (reqs: SchemaDefinition, data: any) => {
   const isRequired = reqs.required
   const isUndef = data === undefined
   const isEmpty = _validations.isObject(data) && !Object.keys(data).length

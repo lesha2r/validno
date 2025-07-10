@@ -4,14 +4,15 @@ import checkRules from "./validateRules.js";
 import _helpers from "./utils/helpers.js";
 import _validations from "./utils/validations.js";
 import { ValidationIds } from "./constants/details.js";
-import { Schema, SchemaInput } from "./Schema.js";
+import { Schema } from "./Schema.js";
 import ValidnoResult from "./ValidnoResult.js";
+import { SchemaDefinition } from "./types/common.js";
 
 export interface KeyValidationDetails {
   results: ValidnoResult,
   key: string,
   data: any,
-  reqs: SchemaInput,
+  reqs: SchemaDefinition,
   nestedKey: string
 }
 
@@ -108,7 +109,7 @@ function validateKeyDetails(this: any, params: {
   key: string;
   nestedKey: string;
   data: any;
-  reqs: SchemaInput;
+  reqs: SchemaDefinition;
   hasMissing: boolean;
 }) {
   const { results, key, nestedKey, data, reqs, hasMissing } = params;
@@ -128,7 +129,7 @@ function validateKeyDetails(this: any, params: {
 
 function handleMissingKeyValidation(
   schema: Schema,
-  params: { results: ValidnoResult; key: string; nestedKey: string; data: any; reqs: SchemaInput },
+  params: { results: ValidnoResult; key: string; nestedKey: string; data: any; reqs: SchemaDefinition },
   missedCheck: boolean[]
 ) {
   const { results, key, nestedKey, data, reqs } = params;
@@ -143,7 +144,7 @@ function checkValueType(
   results: ValidnoResult,
   key: string,
   value: any,
-  reqs: SchemaInput,
+  reqs: SchemaDefinition,
   nestedKey: string,
   typeChecked: boolean[]
 ) {
@@ -161,7 +162,7 @@ function checkRulesForKey(
   results: ValidnoResult,
   nestedKey: string,
   value: any,
-  reqs: SchemaInput,
+  reqs: SchemaDefinition,
   data: any,
   rulesChecked: boolean[]
 ) {

@@ -1,4 +1,4 @@
-export enum ESchemaFields {
+export enum SchemaFields {
     Required = 'required',
     Type = 'type',
     EachType = 'eachType',

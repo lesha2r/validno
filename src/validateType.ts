@@ -13,15 +13,15 @@
  */
 
 // CONSTS
-import { EValidationDetails, EValidationId } from "./constants/details.js";
+import { ValidationDetails, ValidationIds } from "./constants/details.js";
 
 // UTILS
 import _validations from "./utils/validations.js";
 import _errors from "./utils/errors.js";
-import _validateType, { TTypeValidationResult } from "./utils/validateType.js";
+import _validateType, { TypeValidationResult } from "./utils/validateType.js";
 
 // TYPES
-import { TSchemaInput, TSchemaItem } from "./Schema.js";
+import { SchemaInput, SchemaItem } from "./Schema.js";
 
 /**
  * Checks value against multiple possible types.
@@ -30,9 +30,9 @@ import { TSchemaInput, TSchemaItem } from "./Schema.js";
 const validateUnionType = (
   key: string,
   value: unknown,
-  requirements: TSchemaItem,
+  requirements: SchemaItem,
   keyName = key
-): TTypeValidationResult => {
+): TypeValidationResult => {
   const typeList: string[] = Array.isArray(requirements.type)
     ? requirements.type.map((el: any) => String(el?.name || el))
     : [];
@@ -64,7 +64,7 @@ const validateUnionType = (
  * Main type validation function.
  * Validates a value against a single type or multiple types defined in schema.
  */
-const validateType = (key: string, value: unknown, requirements: TSchemaItem | TSchemaInput, keyName = key): TTypeValidationResult[] => {
+const validateType = (key: string, value: unknown, requirements: SchemaItem | SchemaInput, keyName = key): TypeValidationResult[] => {
   const isNotNull = value !== null
   const keyTitle = 'title' in requirements ? requirements.title : keyName
   const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function'
@@ -75,7 +75,7 @@ const validateType = (key: string, value: unknown, requirements: TSchemaItem | T
 
   // Handle case of multiple types like [String, Number]
   if (Array.isArray(requirements.type)) {
-    return [validateUnionType(key, value, requirements as TSchemaItem)]
+    return [validateUnionType(key, value, requirements as SchemaItem)]
   }
 
   if (value === undefined && requirements.required !== true) {
@@ -85,7 +85,7 @@ const validateType = (key: string, value: unknown, requirements: TSchemaItem | T
   const customErrDetails = hasCustomMessage ?
     //@ts-ignore
     requirements.customMessage({
-      keyword: EValidationId.Type,
+      keyword: ValidationIds.Type,
       value: value,
       key: keyName,
       title: keyTitle,
@@ -97,11 +97,11 @@ const validateType = (key: string, value: unknown, requirements: TSchemaItem | T
   const baseErrDetails = _errors.getErrorDetails(keyName, requirements.type, value)
 
   const getDetails = (isOK: boolean, errorText?: string) => isOK ?
-    EValidationDetails.OK :
+    ValidationDetails.OK :
     errorText || customErrDetails || baseErrDetails
 
   const typeBySchema = requirements.type
-  const result: TTypeValidationResult[] = []
+  const result: TypeValidationResult[] = []
 
   switch (typeBySchema) {
     case 'any': {
@@ -122,7 +122,7 @@ const validateType = (key: string, value: unknown, requirements: TSchemaItem | T
       const isDate = isNotNull && value!.constructor === Date
       const isValid = isDate && !isNaN((value as Date).getTime())
       const isValidDate = isDate && isValid
-      result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, EValidationDetails.INVALID_DATE)))
+      result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, ValidationDetails.INVALID_DATE)))
       break
     }
     case Boolean: {

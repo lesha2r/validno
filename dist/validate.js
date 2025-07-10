@@ -2,7 +2,7 @@ import checkType from "./validateType.js";
 import _errors from "./utils/errors.js";
 import checkRules from "./validateRules.js";
 import _helpers from "./utils/helpers.js";
-import { EValidationId } from "./constants/details.js";
+import { ValidationIds } from "./constants/details.js";
 import ValidnoResult from "./ValidnoResult.js";
 function handleMissingKey(schema, input) {
     const { key, nestedKey, data, reqs } = input;
@@ -12,7 +12,7 @@ function handleMissingKey(schema, input) {
         return _errors.getMissingError(messageKey);
     }
     const errorMessage = reqs.customMessage({
-        keyword: EValidationId.Missing,
+        keyword: ValidationIds.Missing,
         value: data[key],
         key: messageKey,
         title: messageTitle,

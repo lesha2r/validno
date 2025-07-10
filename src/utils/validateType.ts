@@ -1,9 +1,9 @@
-import { EValidationDetails } from "../constants/details.js"
+import { ValidationDetails } from "../constants/details.js"
 
 /**
  * Result type for checkType
  */
-export type TTypeValidationResult = {
+export type TypeValidationResult = {
   key: string;
   passed: boolean;
   details?: string;
@@ -16,8 +16,8 @@ const _validateType = {
   getResult: (
     key: string,
     passed: boolean,
-    details: string = EValidationDetails.OK
-  ): TTypeValidationResult => {
+    details: string = ValidationDetails.OK
+  ): TypeValidationResult => {
       return {
         key: key,
         passed: passed,

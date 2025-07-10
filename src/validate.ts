@@ -3,19 +3,19 @@ import _errors from "./utils/errors.js";
 import checkRules from "./validateRules.js";
 import _helpers from "./utils/helpers.js";
 import _validations from "./utils/validations.js";
-import { EValidationId } from "./constants/details.js";
-import { Schema, TSchema, TSchemaInput } from "./Schema.js";
+import { ValidationIds } from "./constants/details.js";
+import { Schema, SchemaInput } from "./Schema.js";
 import ValidnoResult from "./ValidnoResult.js";
 
-export interface IKeyHandler {
+export interface KeyValidationDetails {
   results: ValidnoResult,
   key: string,
   data: any,
-  reqs: TSchemaInput,
+  reqs: SchemaInput,
   nestedKey: string
 }
 
-function handleMissingKey(schema: TSchema, input: IKeyHandler) {
+function handleMissingKey(schema: Schema, input: KeyValidationDetails) {
   const { key, nestedKey, data, reqs } = input;
 
   const messageKey = nestedKey || key;
@@ -27,7 +27,7 @@ function handleMissingKey(schema: TSchema, input: IKeyHandler) {
 
   // @ts-ignore
   const errorMessage = reqs.customMessage({
-    keyword: EValidationId.Missing,
+    keyword: ValidationIds.Missing,
     value: data[key],
     key: messageKey,
     title: messageTitle,
@@ -38,14 +38,14 @@ function handleMissingKey(schema: TSchema, input: IKeyHandler) {
   return errorMessage;
 }
 
-function validateNestedKey(this: any, input: IKeyHandler) {
+function validateNestedKey(this: any, input: KeyValidationDetails) {
   const { results, key, nestedKey, data, reqs } = input;
 
   const nestedKeys = Object.keys(reqs);
   const nestedResults: boolean[] = [];
 
   for (const itemKey of nestedKeys) {
-    const deepParams: IKeyHandler = {
+    const deepParams: KeyValidationDetails = {
       key: itemKey,
       data: data[key],
       // @ts-ignore
@@ -63,7 +63,7 @@ function validateNestedKey(this: any, input: IKeyHandler) {
   return results
 }
 
-function validateKey(this: any, input: IKeyHandler) {
+function validateKey(this: any, input: KeyValidationDetails) {
   let { results, key, nestedKey, data, reqs } = input;
 
   if (data === undefined) {
@@ -108,7 +108,7 @@ function validateKeyDetails(this: any, params: {
   key: string;
   nestedKey: string;
   data: any;
-  reqs: TSchemaInput;
+  reqs: SchemaInput;
   hasMissing: boolean;
 }) {
   const { results, key, nestedKey, data, reqs, hasMissing } = params;
@@ -127,8 +127,8 @@ function validateKeyDetails(this: any, params: {
 }
 
 function handleMissingKeyValidation(
-  schema: TSchema,
-  params: { results: ValidnoResult; key: string; nestedKey: string; data: any; reqs: TSchemaInput },
+  schema: Schema,
+  params: { results: ValidnoResult; key: string; nestedKey: string; data: any; reqs: SchemaInput },
   missedCheck: boolean[]
 ) {
   const { results, key, nestedKey, data, reqs } = params;
@@ -143,7 +143,7 @@ function checkValueType(
   results: ValidnoResult,
   key: string,
   value: any,
-  reqs: TSchemaInput,
+  reqs: SchemaInput,
   nestedKey: string,
   typeChecked: boolean[]
 ) {
@@ -161,7 +161,7 @@ function checkRulesForKey(
   results: ValidnoResult,
   nestedKey: string,
   value: any,
-  reqs: TSchemaInput,
+  reqs: SchemaInput,
   data: any,
   rulesChecked: boolean[]
 ) {
@@ -212,7 +212,7 @@ function validateSchema(
       const toBeValidated = _helpers.needValidation(key, hasKeysToCheck, keysToCheck)
       if (!toBeValidated) continue
         
-      const keyResult = validateKey.call(this, {key, data, reqs} as IKeyHandler)
+      const keyResult = validateKey.call(this, {key, data, reqs} as KeyValidationDetails)
       output.merge(keyResult)
     }
   

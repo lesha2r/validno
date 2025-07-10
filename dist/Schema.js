@@ -1,6 +1,6 @@
-import { ESchemaFields } from "./constants/schema.js";
+import { SchemaFields } from "./constants/schema.js";
 import validate from "./validate.js";
-export const defaultSchemaKeys = Object.values(ESchemaFields);
+export const defaultSchemaKeys = Object.values(SchemaFields);
 export class Schema {
     constructor(inputSchemaDefinition) {
         if (!inputSchemaDefinition || typeof inputSchemaDefinition !== 'object') {

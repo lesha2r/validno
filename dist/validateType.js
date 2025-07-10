@@ -1,4 +1,4 @@
-import { EValidationDetails, EValidationId } from "./constants/details.js";
+import { ValidationDetails, ValidationIds } from "./constants/details.js";
 import _validations from "./utils/validations.js";
 import _errors from "./utils/errors.js";
 import _validateType from "./utils/validateType.js";
@@ -34,7 +34,7 @@ const validateType = (key, value, requirements, keyName = key) => {
     }
     const customErrDetails = hasCustomMessage ?
         requirements.customMessage({
-            keyword: EValidationId.Type,
+            keyword: ValidationIds.Type,
             value: value,
             key: keyName,
             title: keyTitle,
@@ -44,7 +44,7 @@ const validateType = (key, value, requirements, keyName = key) => {
         null;
     const baseErrDetails = _errors.getErrorDetails(keyName, requirements.type, value);
     const getDetails = (isOK, errorText) => isOK ?
-        EValidationDetails.OK :
+        ValidationDetails.OK :
         errorText || customErrDetails || baseErrDetails;
     const typeBySchema = requirements.type;
     const result = [];
@@ -67,7 +67,7 @@ const validateType = (key, value, requirements, keyName = key) => {
             const isDate = isNotNull && value.constructor === Date;
             const isValid = isDate && !isNaN(value.getTime());
             const isValidDate = isDate && isValid;
-            result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, EValidationDetails.INVALID_DATE)));
+            result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, ValidationDetails.INVALID_DATE)));
             break;
         }
         case Boolean: {

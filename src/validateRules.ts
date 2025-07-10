@@ -1,7 +1,7 @@
 import _validations from "./utils/validations.js"
-import { TSchema, TSchemaItem } from "./Schema.js";
+import { SchemaItem, Schema } from "./Schema.js";
 
-export type TRule = {[key: string]: any}
+export type Rule = Record<string, any>
 
 type TLengths = string | Array<any>
 
@@ -21,7 +21,7 @@ const ensureRuleHasCorrectType = (value: any, allowedTypes: any[]) => {
 }
 
 const rulesFunctions: any = {
-    custom: (key: string, val: any, func: Function, extra: {schema: TSchema, input: {[key: string]: any}}) => {
+    custom: (key: string, val: any, func: Function, extra: {schema: Schema, input: {[key: string]: any}}) => {
         return func(val, extra)
     },
     isEmail: (key: string, val: any) => {
@@ -124,13 +124,13 @@ const rulesFunctions: any = {
     }
 };
 
-type TRulesResult = {
+type RuleCheckResult = {
     ok: boolean,
     details: string[]
 } 
 
-function validateRules (this: any, key: string, value: any, requirements: TSchemaItem, inputObj: any) {
-    const result: TRulesResult = {
+function validateRules (this: any, key: string, value: any, requirements: SchemaItem, inputObj: any) {
+    const result: RuleCheckResult = {
         ok: true,
         details: []
     };
@@ -143,7 +143,7 @@ function validateRules (this: any, key: string, value: any, requirements: TSchem
         return result
     }
 
-    const rules: TRule = requirements.rules
+    const rules: Rule = requirements.rules
     const title = requirements.title || key
 
     const allResults = []

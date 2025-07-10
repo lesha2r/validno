@@ -1,10 +1,10 @@
-export var ESchemaFields;
-(function (ESchemaFields) {
-    ESchemaFields["Required"] = "required";
-    ESchemaFields["Type"] = "type";
-    ESchemaFields["EachType"] = "eachType";
-    ESchemaFields["Rules"] = "rules";
-    ESchemaFields["Title"] = "title";
-    ESchemaFields["CustomMessage"] = "customMessage";
-    ESchemaFields["JoinErrors"] = "joinErrors";
-})(ESchemaFields || (ESchemaFields = {}));
+export var SchemaFields;
+(function (SchemaFields) {
+    SchemaFields["Required"] = "required";
+    SchemaFields["Type"] = "type";
+    SchemaFields["EachType"] = "eachType";
+    SchemaFields["Rules"] = "rules";
+    SchemaFields["Title"] = "title";
+    SchemaFields["CustomMessage"] = "customMessage";
+    SchemaFields["JoinErrors"] = "joinErrors";
+})(SchemaFields || (SchemaFields = {}));

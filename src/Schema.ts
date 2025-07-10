@@ -1,36 +1,35 @@
-import { ESchemaFields } from "./constants/schema.js"
+import { SchemaFields } from "./constants/schema.js"
 import validate from "./validate.js"
 
-interface ICustomMessage {
+interface CustomMessageDetails {
     keyword: string,
     value: unknown,
     key: string,
     title: string,
-    reqs: TSchemaItem,
-    schema: TSchemaInput,
+    reqs: SchemaItem,
+    schema: SchemaInput,
     rules?: Record<string, unknown>
 }
 
-export type TSchemaItem = {
+export interface SchemaItem {
     required: boolean,
     type: unknown,
     eachType?: unknown,
     rules?: Record<string, unknown>,
     title?: string,
-    customMessage?: (callbackInput: ICustomMessage) => string
+    customMessage?: (callbackInput: CustomMessageDetails) => string
 }
 
-export type TSchemaInput = {
-    [fieldName: string]: TSchemaItem | TSchemaInput
+export interface SchemaInput {
+    [fieldName: string]: SchemaItem | SchemaInput
 }
 
-export const defaultSchemaKeys = Object.values(ESchemaFields);
-export type TSchema = TSchemaInput
+export const defaultSchemaKeys = Object.values(SchemaFields);
 
 export class Schema {
-    schema: TSchema
+    schema: SchemaInput
 
-    constructor(inputSchemaDefinition: TSchema) {
+    constructor(inputSchemaDefinition: SchemaInput) {
         if (!inputSchemaDefinition || typeof inputSchemaDefinition !== 'object') {
             throw new Error("Invalid schema input");
         }

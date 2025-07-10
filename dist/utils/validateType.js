@@ -1,6 +1,6 @@
-import { EValidationDetails } from "../constants/details.js";
+import { ValidationDetails } from "../constants/details.js";
 const _validateType = {
-    getResult: (key, passed, details = EValidationDetails.OK) => {
+    getResult: (key, passed, details = ValidationDetails.OK) => {
         return {
             key: key,
             passed: passed,

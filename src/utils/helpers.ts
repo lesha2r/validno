@@ -1,6 +1,7 @@
-import { defaultSchemaKeys, TSchemaInput } from "../Schema.js"
-import { IKeyHandler } from "../validate.js"
 import _validations from "./validations.js"
+import { defaultSchemaKeys, SchemaInput } from "../Schema.js"
+import { KeyValidationDetails } from "../validate.js"
+
 
 const _helpers: {[key: string]: Function} = {}
 
@@ -16,7 +17,7 @@ _helpers.checkIsNested = (obj: {[key: string]: any}) => {
   }
 }
 
-_helpers.checkNestedIsMissing = (reqs: TSchemaInput, data: any) => {
+_helpers.checkNestedIsMissing = (reqs: SchemaInput, data: any) => {
   const isRequired = reqs.required
   const isUndef = data === undefined
   const isEmpty = _validations.isObject(data) && !Object.keys(data).length
@@ -42,7 +43,7 @@ _helpers.needValidation = (
   return noLimits || keyIsInList
 }
 
-_helpers.hasMissing = (input: IKeyHandler) => {
+_helpers.hasMissing = (input: KeyValidationDetails) => {
   const {reqs, data, key} = input;
 
   // @ts-ignore

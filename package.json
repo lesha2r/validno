@@ -1,7 +1,7 @@
 {
   "name": "validno",
   "version": "0.3.1",
-  "description": "",
+  "description": "A lightweight TypeScript validation library for runtime data validation.",
   "main": "dist/index.js",
   "scripts": {
     "tsc": "tsc -b src/",

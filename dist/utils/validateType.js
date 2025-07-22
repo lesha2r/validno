@@ -1,11 +1,12 @@
 import { ValidationDetails } from "../constants/details.js";
-const _validateType = {
-    getResult: (key, passed, details = ValidationDetails.OK) => {
+class TypeValidationUtility {
+    getResult(key, passed, details = ValidationDetails.OK) {
         return {
-            key: key,
-            passed: passed,
-            details: details,
+            key,
+            passed,
+            details
         };
     }
-};
-export default _validateType;
+}
+const validateType = new TypeValidationUtility();
+export default validateType;

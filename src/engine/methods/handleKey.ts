@@ -1,0 +1,64 @@
+import _helpers from "../../utils/helpers.js";
+import ValidnoResult from "../ValidnoResult.js";
+import { SchemaDefinition } from "../../types/common.js";
+import ValidateEngine, { KeyValidationDetails } from "../ValidateEngine.js";
+
+export interface ValidateKeyDetailsParams {
+    results: ValidnoResult;
+    key: string;
+    nestedKey: string;
+    data: any;
+    reqs: SchemaDefinition;
+    hasMissing: boolean;
+}
+
+function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams) {
+    const { results, key, nestedKey, data, reqs, hasMissing } = params;
+
+    const missedCheck: boolean[] = [];
+    const typeChecked: boolean[] = [];
+    const rulesChecked: boolean[] = [];
+
+    if (hasMissing) {
+      return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
+    }
+
+    this.validateType({results, key, value: data[key], reqs, nestedKey, typeChecked});
+    this.validateRules({results, nestedKey, value: data[key], reqs, data, rulesChecked});
+
+    return this.finishValidation({results, nestedKey, missedCheck, typeChecked, rulesChecked});
+}
+
+function validateKey(this: ValidateEngine, input: KeyValidationDetails) {
+    let { results, key, nestedKey, data, reqs } = input;
+
+    if (data === undefined) {
+      const noDataResult = new ValidnoResult()
+      noDataResult.setNoData(nestedKey)
+    }
+
+    if (!results) results = new ValidnoResult();
+    if (!nestedKey) nestedKey = key;
+
+    const hasMissing = _helpers.hasMissing(input);
+
+    if (_helpers.checkNestedIsMissing(reqs, data)) {
+      return this.handleMissingNestedKey(nestedKey, results);
+    }
+
+    if (_helpers.checkIsNested(reqs)) {
+      return this.handleNestedKey({ results, key, data, reqs, nestedKey });
+    }
+
+    // Validate key
+    return validateKeyValue.call(this, {
+      results,
+      key,
+      nestedKey,
+      data,
+      reqs,
+      hasMissing,
+    });
+}
+
+export default validateKey;

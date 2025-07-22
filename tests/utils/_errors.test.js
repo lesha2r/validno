@@ -6,8 +6,8 @@ test('Тест _errors.getMissingError', () => {
     const emptyKey = _errors.getMissingError()
     const okKey = _errors.getMissingError(key)
 
-    expect(emptyKey).toBe(`Отсутствует значение 'na'`)
-    expect(okKey).toBe(`Отсутствует значение '${key}'`)
+    expect(emptyKey).toBe(`Missing value for 'na'`)
+    expect(okKey).toBe(`Missing value for '${key}'`)
 });
 
 test('Тест _errors.joinErrors', () => {
@@ -44,8 +44,8 @@ test('Тест _errors.getErrorDetails', () => {
 
     const okCustom = _errors.getErrorDetails(key, CustomTest, customObj)
 
-    const getError = (key, expected, recieved) => {
-        return `Проверьте тип '${key}': ожидался ${expected}, получен ${recieved}`
+    const getError = (key, expected, received) => {
+        return `Check the type of '${key}': expected ${expected}, received ${received}`;
     }
 
     expect(errorNull).toBe(getError(key, 'String', 'null'))

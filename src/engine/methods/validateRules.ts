@@ -1,6 +1,17 @@
-import _validations from "./utils/validations.js"
-import { Schema } from "./Schema.js";
-import { FieldSchema } from "./types/common.js";
+import { Schema } from "../../Schema.js";
+import _validations from "../../utils/validations.js";
+import ValidnoResult from "../ValidnoResult.js";
+
+import { FieldSchema, SchemaDefinition } from "../../types/common.js";
+
+export interface ValidateRulesInput {
+    results: ValidnoResult,
+    nestedKey: string,
+    value: any,
+    reqs: SchemaDefinition,
+    data: any,
+    rulesChecked: boolean[]
+}
 
 export type Rule = Record<string, any>
 
@@ -28,50 +39,50 @@ const rulesFunctions: any = {
     isEmail: (key: string, val: any) => {
         return {
             result: _validations.isEmail(val),
-            details: `Значение должно соответствовать формату name@email.ru`
+            details: `Value must be a valid email address`
         }
     },
     is: (key: string, val: any, equalTo: any) => {
         return {
             result: _validations.is(val, equalTo),
-            details: `Значение должно быть "${equalTo}"`
+            details: `Value must be equal to "${equalTo}"`
         }
     },
     isNot: (key: string, val: any, notEqualTo: any) => {
         return {
             result: _validations.isNot(val, notEqualTo),
-            details: `Значение "${notEqualTo}" недопустимо`
+            details: `Value must not be equal to "${notEqualTo}"`
         }
     },
     min: (key: string, val: number, min: number) => {
         return {
             result: _validations.isNumberGte(val, min),
-            details: "Значение не может быть меньше " + min
+            details: `Value must be greater than or equal to ${min}`
         }
     },
     max: (key: string, val: number, max: number) => {
         return {
             result: _validations.isNumberLte(val, max),
-            details: "Значение не может быть больше " + max
+            details: `Value must be less than or equal to ${max}`
         }
     },
     minMax: (key: string, val: number, minMax: [min: number, max: number]) => {
         const [min, max] = minMax
         return {
             result: _validations.isNumberGte(val, min) && _validations.isNumberLte(val, max),
-            details: `Значение должно быть в пределах ${min}-${max}`
+            details: `Value must be between ${min} and ${max}`
         }
     },
     length: (key: string, val: TLengths, length: number) => {
         return {
             result: _validations.lengthIs(val, length),
-            details: "Количество символов должно быть равным " + length
+            details: `Value must be equal to ${length}`
         }
     },
     lengthNot: (key: string, val:  TLengths, lengthNot: number) => {
         return {
             result: _validations.lengthNot(val, lengthNot),
-            details: "Количество символов не должно быть равным " + lengthNot
+            details: `Value must not be equal to ${lengthNot}`
         }
     },
     lengthMinMax: (key: string, val:  TLengths, minMax: [min: number, max: number]) => {
@@ -79,7 +90,7 @@ const rulesFunctions: any = {
 
         return {
             result: _validations.lengthMin(val, min) && _validations.lengthMax(val, max),
-            details: `Длина должна быть от ${min} до ${max} символов`
+            details: `Value must be between ${min} and ${max} characters`
         }
     },
     lengthMin: (key: string, val:  TLengths, min: number) => {
@@ -87,19 +98,19 @@ const rulesFunctions: any = {
 
         return {
             result: _validations.lengthMin(val, min),
-            details: `Длина не может быть меньше ${min} символов`
+            details: `Value must be at least ${min} characters`
         }
     },
     lengthMax: (key: string, val:  TLengths, max: number) => {
         return {
             result: _validations.lengthMax(val, max),
-            details: `Длина не может быть больше ${max} символов`
+            details: `Value must not be exceed ${max} characters`
         }
     },
     regex: (key: string, val: any, regex: RegExp) => {
         return {
             result: _validations.regexTested(val, regex),
-            details: "Значение не соответствует допустимому формату"
+            details: `Value must match the format ${regex}`
         }
     },
     enum: (key: string, value: any, allowedList: any[]) => {
@@ -111,14 +122,14 @@ const rulesFunctions: any = {
         if (!Array.isArray(value)) {
             const isCorrect = allowedList.includes(value)
             output.result = isCorrect,
-            output.details = isCorrect ? '' : `Значение "${value}" недопустимо`
+            output.details = isCorrect ? '' : `Value "${value}" is not allowed`
         } else {
             const incorrectValues: any[] = []
             value.forEach((v: any) => !allowedList.includes(v) ? incorrectValues.push(v): {})
             const isCorrect = incorrectValues.length === 0
 
             output.result = isCorrect,
-            output.details = isCorrect ? '' : `Значения недопустимы: "${incorrectValues.join(', ')}"`
+            output.details = isCorrect ? '' : `Values are not allowed: "${incorrectValues.join(', ')}"`
         }
 
         return output
@@ -130,7 +141,7 @@ type RuleCheckResult = {
     details: string[]
 } 
 
-function validateRules (this: any, key: string, value: any, requirements: FieldSchema, inputObj: any) {
+function unnamed (this: any, key: string, value: any, requirements: FieldSchema, inputObj: any) {
     const result: RuleCheckResult = {
         ok: true,
         details: []
@@ -193,4 +204,21 @@ function validateRules (this: any, key: string, value: any, requirements: FieldS
     return result;
   };
 
-  export default validateRules
+function validateRules(input: ValidateRulesInput) {
+    const { results, nestedKey, value, reqs, data, rulesChecked } = input;
+    // @ts-ignore
+    const ruleCheck = unnamed.call(this, nestedKey, value, reqs, data);
+
+    if (!ruleCheck.ok) {
+      rulesChecked.push(false);
+
+      ruleCheck.details.forEach((el: any) => {
+        if (!(nestedKey in results.errorsByKeys)) results.errorsByKeys[nestedKey] = [];
+        
+        results.errors.push(el);
+        results.errorsByKeys[nestedKey] = ['1'];
+      });
+    }
+}
+
+export default validateRules;

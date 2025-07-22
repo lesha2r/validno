@@ -176,9 +176,9 @@ describe('Тестирование обработки пропущенных с�
             failed: ['parent','parent.childA','parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'].sort(),
             missed: ['parent.childA.childA1', 'parent.childA.childA2', 'parentBMissing'].sort(),
             errors: [
-                "Отсутствует значение 'parent.childA.childA1'",
-                "Отсутствует значение 'parent.childA.childA2'",
-                "Отсутствует значение 'parentBMissing'",
+                "Missing value for 'parent.childA.childA1'",
+                "Missing value for 'parent.childA.childA2'",
+                "Missing value for 'parentBMissing'",
             ].sort(),
             passed: ['parent.childB', 'keyOk', 'notRequired'].sort(),
             byKeys: {
@@ -192,9 +192,9 @@ describe('Тестирование обработки пропущенных с�
                 notRequired: true
             },
             errorsByKeys: {
-                'parent.childA.childA1': ["Отсутствует значение 'parent.childA.childA1'"],
-                'parent.childA.childA2': ["Отсутствует значение 'parent.childA.childA2'"],
-                parentBMissing: [ "Отсутствует значение 'parentBMissing'" ]
+                'parent.childA.childA1': ["Missing value for 'parent.childA.childA1'"],
+                'parent.childA.childA2': ["Missing value for 'parent.childA.childA2'"],
+                parentBMissing: [ "Missing value for 'parentBMissing'" ]
             }
         })
     })

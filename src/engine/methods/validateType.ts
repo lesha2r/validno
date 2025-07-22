@@ -1,28 +1,13 @@
-/**
- * Last refactored: 12.06.2025 (by @leshatour)  
- * 
- * 12.06.2025:
- * - Better TS typing
- * - Renamed checkType to validateType
- * - Renamed checkTypeMultiple to validateUnionType
- * - Extracted some logic to utils
- * - Extracted string value to constants
- * - Minimized code complexity
- * - Added more comments
- * - Added more types
- */
+import { SchemaDefinition, FieldSchema } from "../../types/common.js";
+import ValidnoResult from "../ValidnoResult.js";
 
-// CONSTS
-import { ValidationDetails, ValidationIds } from "./constants/details.js";
+// Consts
+import { ValidationDetails, ValidationIds } from "../../constants/details.js";
 
-// UTILS
-import _validations from "./utils/validations.js";
-import _errors from "./utils/errors.js";
-import _validateType, { TypeValidationResult } from "./utils/validateType.js";
-import { SchemaDefinition, FieldSchema } from "./types/common.js";
-
-// TYPES
-
+// Utils
+import _validations from "../../utils/validations.js";
+import _errors from "../../utils/errors.js";
+import _validateType, { TypeValidationResult } from "../../utils/validateType.js";
 
 /**
  * Checks value against multiple possible types.
@@ -43,7 +28,7 @@ const validateUnionType = (
   for (let i = 0; i < typeList.length; i++) {
       // @ts-ignore
     const requirementsRe = { ...requirements, type: requirements.type[i] }
-    const result = validateType(key, value, requirementsRe)
+    const result = handleTypeValidation(key, value, requirementsRe)
     results.push(result[0].passed)
 
     // If any type validation passes, return immediately
@@ -55,7 +40,7 @@ const validateUnionType = (
   const result = _validateType.getResult(
     keyName,
     isPassed,
-    isPassed ? null : _errors.getErrorDetails(keyName, typeList.join('/'), value)
+    isPassed ? undefined : _errors.getErrorDetails(keyName, typeList.join('/'), value)
   );
 
   return result
@@ -65,7 +50,7 @@ const validateUnionType = (
  * Main type validation function.
  * Validates a value against a single type or multiple types defined in schema.
  */
-const validateType = (key: string, value: unknown, requirements: FieldSchema | SchemaDefinition, keyName = key): TypeValidationResult[] => {
+const handleTypeValidation = (key: string, value: unknown, requirements: FieldSchema | SchemaDefinition, keyName = key): TypeValidationResult[] => {
   const isNotNull = value !== null
   const keyTitle = 'title' in requirements ? requirements.title : keyName
   const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function'
@@ -140,7 +125,8 @@ const validateType = (key: string, value: unknown, requirements: FieldSchema | S
       let isEachChecked = { passed: true, details: "" }
       if ('eachType' in requirements) {
         for (const el of value as any[]) {
-          const result = validateType('each of ' + key, el, { type: requirements.eachType, required: true })
+          const result = handleTypeValidation(`each of ${key}`, el, { type: requirements.eachType, required: true })
+          
           if (!result[0].passed) {
             isEachChecked.passed = false
             isEachChecked.details = result[0].details || ''
@@ -179,4 +165,25 @@ const validateType = (key: string, value: unknown, requirements: FieldSchema | S
   return result;
 };
 
-export default validateType
+export interface ValidateValueInput {
+    results: ValidnoResult,
+    key: string,
+    value: any,
+    reqs: SchemaDefinition,
+    nestedKey: string,
+    typeChecked: boolean[]
+}
+
+function validateType(input: ValidateValueInput) {
+    const { results, key, value, reqs, nestedKey, typeChecked } = input;
+    const typeCheck = handleTypeValidation(key, value, reqs, nestedKey);
+
+    typeCheck.forEach((res) => {
+      if (!res.passed) {
+        typeChecked.push(false);
+        results.errors.push(res.details || '');
+      }
+    });
+}
+
+export default validateType;

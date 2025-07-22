@@ -5,6 +5,6 @@ export enum ValidationIds {
 } 
 
 export enum ValidationDetails {
-    OK = 'ok',
-    INVALID_DATE = 'Дата невалидна',
+    OK = 'OK',
+    INVALID_DATE = 'Invalid date',
 }

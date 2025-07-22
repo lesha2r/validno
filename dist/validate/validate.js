@@ -1,9 +1,9 @@
-import validateType from "./validateType.js";
-import validateRules from "./validateRules.js";
-import { ValidationIds } from "./constants/details.js";
-import ValidnoResult from "./ValidnoResult.js";
-import _errors from "./utils/errors.js";
-import _helpers from "./utils/helpers.js";
+import validateType from "../validateType.js";
+import validateRules from "../validateRules.js";
+import { ValidationIds } from "../constants/details.js";
+import ValidnoResult from "../ValidnoResult.js";
+import _errors from "../utils/errors.js";
+import _helpers from "../utils/helpers.js";
 class ValidateEngine {
     constructor(definition) {
         this.definition = definition;

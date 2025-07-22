@@ -1,25 +1,17 @@
-import validateType from "./validateType.js";
-import validateRules from "./validateRules.js";
-import { ValidationIds } from "./constants/details.js";
-import ValidnoResult from "./ValidnoResult.js";
-import _errors from "./utils/errors.js";
-import _helpers from "./utils/helpers.js";
+import validateType from "../../validateType.js";
+import validateRules from "../../validateRules.js";
+import { ValidationIds } from "../../constants/details.js";
+import ValidnoResult from "../../ValidnoResult.js";
+import _errors from "../../utils/errors.js";
+import _helpers from "../../utils/helpers.js";
+import validate from "../validate.js";
 class ValidateEngine {
     constructor(definition) {
         this.definition = definition;
         this.result = new ValidnoResult();
     }
     validate(data, validationKeys) {
-        const hasKeysToCheck = _helpers.areKeysLimited(validationKeys);
-        const schemaKeys = Object.entries(this.definition);
-        for (const [key, reqs] of schemaKeys) {
-            const toBeValidated = _helpers.needValidation(key, hasKeysToCheck, validationKeys);
-            if (!toBeValidated)
-                continue;
-            const keyResult = this.validateKey({ key, data, reqs });
-            this.result.merge(keyResult);
-        }
-        return this.result.finish();
+        return validate.call(this, data, validationKeys);
     }
     handleMissingKey(schema, input) {
         const { key, nestedKey, data, reqs } = input;
@@ -144,8 +136,4 @@ class ValidateEngine {
         return results.finish();
     }
 }
-const validateSchema = (schemaDef, data, keysToValidate) => {
-    const engine = new ValidateEngine(schemaDef);
-    return engine.validate(data, keysToValidate);
-};
-export default validateSchema;
+export default ValidateEngine;

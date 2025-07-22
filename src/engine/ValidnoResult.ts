@@ -1,4 +1,4 @@
-import _errors from "./utils/errors.js";
+import _errors from "../utils/errors.js";
 
 export interface ResultInput {
   ok: null | boolean;
@@ -29,9 +29,9 @@ class ValidnoResult {
     this.errorsByKeys = results?.errorsByKeys || {};
   }
 
-  setNoData(): void {
+  setNoData(key: string): void {
     this.ok = false;
-    this.errors = ['Отсутствует объект для проверки'];
+    this.errors = [`Missing value for '${key}'`];
   }
 
   setKeyStatus(key: string, result: boolean): void {

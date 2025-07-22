@@ -10,6 +10,7 @@ export class Schema {
     }
     validate(inputData, validationKeys) {
         const engine = new ValidateEngine(this.definition);
-        return engine.validate(inputData, validationKeys);
+        const result = engine.validate(inputData, validationKeys);
+        return result;
     }
 }

@@ -2,9 +2,9 @@ import _helpers from "../../utils/helpers.js"
 import ValidnoResult from "../ValidnoResult.js"
 import ValidateEngine, { KeyValidationDetails } from "../ValidateEngine.js"
 
-function validate<T extends Record<string, unknown>>(
+function validate(
     this: ValidateEngine,
-    data: T,
+    data: any,
     validationKeys?: string | string[]
 ): ValidnoResult {
     const hasKeysToCheck = _helpers.areKeysLimited(validationKeys)

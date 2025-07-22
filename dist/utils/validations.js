@@ -10,7 +10,7 @@ class ValidationUtility {
         return Array.isArray(value);
     }
     isObject(value) {
-        let _a;
+        var _a;
         return value !== null &&
             typeof value === 'object' &&
             ((_a = value === null || value === void 0 ? void 0 : value.constructor) === null || _a === void 0 ? void 0 : _a.name) === 'Object' &&

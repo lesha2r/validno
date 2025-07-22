@@ -1,4 +1,5 @@
 import _validations from "../../utils/validations.js";
+import { ValidationDetails } from "../../constants/details.js";
 export const rulesParams = {
     lengthMin: {
         allowedTypes: [String]
@@ -13,7 +14,21 @@ const ensureRuleHasCorrectType = (value, allowedTypes) => {
 };
 const rulesFunctions = {
     custom: (key, val, func, extra) => {
-        return func(val, extra);
+        const customResult = func(val, extra);
+        if (typeof customResult === 'object' && 'result' in customResult) {
+            return {
+                result: customResult.result,
+                details: customResult.details || ValidationDetails.CustomRuleFailed,
+            };
+        }
+        if (typeof customResult === 'boolean') {
+            return {
+                result: customResult,
+                details: customResult ? "" : ValidationDetails.CustomRuleFailed
+            };
+        }
+        throw new Error(`Custom rule function must return an object with 'result' and 'details' properties or a boolean value. Received: ${typeof customResult}`);
+        return;
     },
     isEmail: (key, val) => {
         return {
@@ -110,7 +125,7 @@ const rulesFunctions = {
         return output;
     }
 };
-function unnamed(key, value, requirements, inputObj) {
+function checkRules(key, value, requirements, inputObj) {
     const result = {
         ok: true,
         details: []
@@ -133,7 +148,7 @@ function unnamed(key, value, requirements, inputObj) {
         }
         const func = rulesFunctions[ruleName];
         const args = rules[ruleName];
-        const result = func(key, value, args, { schema: this.schema, input: inputObj });
+        let result = func(key, value, args, { schema: this.schema, input: inputObj });
         if (requirements.customMessage && typeof requirements.customMessage === 'function') {
             result.details = requirements.customMessage({
                 keyword: ruleName,
@@ -158,7 +173,7 @@ function unnamed(key, value, requirements, inputObj) {
 ;
 function validateRules(input) {
     const { results, nestedKey, value, reqs, data, rulesChecked } = input;
-    const ruleCheck = unnamed.call(this, nestedKey, value, reqs, data);
+    const ruleCheck = checkRules.call(this, nestedKey, value, reqs, data);
     if (!ruleCheck.ok) {
         rulesChecked.push(false);
         ruleCheck.details.forEach((el) => {

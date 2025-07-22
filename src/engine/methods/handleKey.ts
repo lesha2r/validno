@@ -14,7 +14,6 @@ export interface ValidateKeyDetailsParams {
 
 function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams) {
     const { results, key, nestedKey, data, reqs, hasMissing } = params;
-
     const missedCheck: boolean[] = [];
     const typeChecked: boolean[] = [];
     const rulesChecked: boolean[] = [];
@@ -50,7 +49,6 @@ function validateKey(this: ValidateEngine, input: KeyValidationDetails) {
       return this.handleNestedKey({ results, key, data, reqs, nestedKey });
     }
 
-    // Validate key
     return validateKeyValue.call(this, {
       results,
       key,

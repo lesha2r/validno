@@ -7,4 +7,5 @@ export enum ValidationIds {
 export enum ValidationDetails {
     OK = 'OK',
     INVALID_DATE = 'Invalid date',
+    CustomRuleFailed = 'Custom rule failed',
 }

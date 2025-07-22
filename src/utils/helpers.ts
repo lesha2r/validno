@@ -81,12 +81,9 @@ class HelperUtility implements HelperUtils {
   hasMissing(input: KeyValidationDetails): boolean {
     const { reqs, data, key } = input;
 
-    const isRequired = !!reqs.required;
-    const missingData = (
-      data === undefined ||
-      !(key in data) ||
-      data[key] === undefined
-    );
+    // @ts-ignore
+    const isRequired = reqs.required === undefined || reqs.required === true;
+    const missingData = (data === undefined || !(key in data) || data[key] === undefined);
 
     return isRequired && missingData;
   }

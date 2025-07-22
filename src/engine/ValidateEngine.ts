@@ -33,7 +33,7 @@ constructor(definition: SchemaDefinition) {
     this.result = new ValidnoResult();
   }
 
-  validate<T extends Record<string, unknown>>(data: T, validationKeys?: string | string[]): ValidnoResult {
+  validate(data: any, validationKeys?: string | string[]): ValidnoResult {
     return validate.call(this, data, validationKeys);
   }
 
@@ -44,7 +44,7 @@ constructor(definition: SchemaDefinition) {
   handleNestedKey(input: KeyValidationDetails) {
     return handleNestedKey.call(this, input);
   }
-  
+
   handleMissingKey(schema: Schema, input: KeyValidationDetails) {
     return handleMissingKey(schema, input);
   }

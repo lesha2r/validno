@@ -1,6 +1,7 @@
 import { Schema } from "../../Schema.js";
 import _validations from "../../utils/validations.js";
 import ValidnoResult from "../ValidnoResult.js";
+import { ValidationDetails } from "../../constants/details.js";
 
 import { FieldSchema, SchemaDefinition } from "../../types/common.js";
 
@@ -32,9 +33,35 @@ const ensureRuleHasCorrectType = (value: any, allowedTypes: any[]) => {
     return isInAllowedList
 }
 
+interface CustomRuleExtras {
+    schema: Schema,
+    input: {[key: string]: any}
+}
+
 const rulesFunctions: any = {
-    custom: (key: string, val: any, func: Function, extra: {schema: Schema, input: {[key: string]: any}}) => {
-        return func(val, extra)
+    custom: (key: string, val: any, func: (value: unknown, extras: CustomRuleExtras) => {result: boolean, details: string}, extra: CustomRuleExtras) => {
+        const customResult = func(val, extra)
+
+        // Check if the result is an object with 'result' property
+        if (typeof customResult === 'object' && 'result' in customResult) {
+            return {
+                result: customResult.result,
+                details: customResult.details || ValidationDetails.CustomRuleFailed,
+            }
+        }
+
+        // ... or check if the result is a boolean
+        if (typeof customResult === 'boolean') {
+            return {
+                result: customResult,
+                details: customResult ? "" : ValidationDetails.CustomRuleFailed
+            }
+        }
+
+        // If the result is neither an object nor a boolean, throw an error
+        throw new Error(`Custom rule function must return an object with 'result' and 'details' properties or a boolean value. Received: ${typeof customResult}`);
+
+        return 
     },
     isEmail: (key: string, val: any) => {
         return {
@@ -141,7 +168,7 @@ type RuleCheckResult = {
     details: string[]
 } 
 
-function unnamed (this: any, key: string, value: any, requirements: FieldSchema, inputObj: any) {
+function checkRules (this: any, key: string, value: any, requirements: FieldSchema, inputObj: any) {
     const result: RuleCheckResult = {
         ok: true,
         details: []
@@ -171,10 +198,10 @@ function unnamed (this: any, key: string, value: any, requirements: FieldSchema,
             continue
         }
 
-        const func = rulesFunctions[ruleName]
-        const args = rules[ruleName]
+        const func = rulesFunctions[ruleName];
+        const args = rules[ruleName];
 
-        const result = func(key, value, args, {schema: this.schema, input: inputObj})
+        let result = func(key, value, args, { schema: this.schema, input: inputObj });
         
         if (requirements.customMessage && typeof requirements.customMessage === 'function') {
             result.details = requirements.customMessage({
@@ -202,12 +229,12 @@ function unnamed (this: any, key: string, value: any, requirements: FieldSchema,
     }
 
     return result;
-  };
+};
 
 function validateRules(input: ValidateRulesInput) {
     const { results, nestedKey, value, reqs, data, rulesChecked } = input;
     // @ts-ignore
-    const ruleCheck = unnamed.call(this, nestedKey, value, reqs, data);
+    const ruleCheck = checkRules.call(this, nestedKey, value, reqs, data);
 
     if (!ruleCheck.ok) {
       rulesChecked.push(false);

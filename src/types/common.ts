@@ -3,7 +3,7 @@ export interface SchemaDefinition {
 }
 
 export interface FieldSchema {
-    required: boolean,
+    required?: boolean,
     type: unknown,
     eachType?: unknown,
     rules?: Record<string, unknown>,

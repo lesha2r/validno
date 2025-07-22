@@ -1,6 +1,7 @@
 import { SchemaFields } from "./constants/schema.js"
 import { SchemaDefinition } from "./types/common.js";
 import ValidateEngine from "./engine/ValidateEngine.js";
+import ValidnoResult from "./engine/ValidnoResult.js";
 
 export const defaultSchemaKeys = Object.values(SchemaFields);
 
@@ -15,11 +16,9 @@ export class Schema {
         this.definition = inputSchemaDefinition;
     }
 
-    validate<T extends Record<string, unknown>>(
-        inputData: T,
-        validationKeys?: string | string[]
-    ) {
+    validate<T, K extends keyof T = keyof T>(inputData: T, validationKeys?: K | K[]): ValidnoResult {
         const engine = new ValidateEngine(this.definition);
-        return engine.validate(inputData, validationKeys);
+        const result = engine.validate(inputData, validationKeys as string | string[]);
+        return result;
     }
 }

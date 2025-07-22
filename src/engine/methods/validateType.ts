@@ -50,43 +50,50 @@ const validateUnionType = (
  * Main type validation function.
  * Validates a value against a single type or multiple types defined in schema.
  */
-const handleTypeValidation = (key: string, value: unknown, requirements: FieldSchema | SchemaDefinition, keyName = key): TypeValidationResult[] => {
+const handleTypeValidation = (
+  key: string,
+  value: unknown,
+  requirements: FieldSchema | SchemaDefinition,
+  keyName = key
+): TypeValidationResult[] => {
+  const reqs = { required: true, ...requirements } as FieldSchema;
+
   const isNotNull = value !== null
-  const keyTitle = 'title' in requirements ? requirements.title : keyName
-  const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function'
-  
-  if (value === undefined && requirements.required) {
+  const keyTitle = 'title' in reqs && reqs.title !== undefined ? reqs.title : keyName
+  const hasCustomMessage = reqs.customMessage && typeof reqs.customMessage === 'function'
+
+  if (value === undefined && reqs.required) {
     return [_validateType.getResult(keyName, false, _errors.getMissingError(keyName))]
   }
 
   // Handle case of multiple types like [String, Number]
-  if (Array.isArray(requirements.type)) {
-    return [validateUnionType(key, value, requirements as FieldSchema)]
+  if (Array.isArray(reqs.type)) {
+    return [validateUnionType(key, value, reqs as FieldSchema)]
   }
 
-  if (value === undefined && requirements.required !== true) {
+  if (value === undefined && reqs.required === false) {
     return [_validateType.getResult(keyName, true)] 
   }
   
   const customErrDetails = hasCustomMessage ?
     //@ts-ignore
-    requirements.customMessage({
+    reqs.customMessage({
       keyword: ValidationIds.Type,
       value: value,
       key: keyName,
-      title: keyTitle,
-      reqs: requirements,
-      schema: null
+      title: keyTitle as string,
+      reqs: reqs,
+      schema: {} as SchemaDefinition
     }) :
     null;
 
-  const baseErrDetails = _errors.getErrorDetails(keyName, requirements.type, value)
+  const baseErrDetails = _errors.getErrorDetails(keyName, reqs.type, value)
 
   const getDetails = (isOK: boolean, errorText?: string) => isOK ?
     ValidationDetails.OK :
     errorText || customErrDetails || baseErrDetails
 
-  const typeBySchema = requirements.type
+  const typeBySchema = reqs.type
   const result: TypeValidationResult[] = []
 
   switch (typeBySchema) {
@@ -123,10 +130,10 @@ const handleTypeValidation = (key: string, value: unknown, requirements: FieldSc
         break
       }
       let isEachChecked = { passed: true, details: "" }
-      if ('eachType' in requirements) {
+      if ('eachType' in reqs) {
         for (const el of value as any[]) {
-          const result = handleTypeValidation(`each of ${key}`, el, { type: requirements.eachType, required: true })
-          
+          const result = handleTypeValidation(`each of ${key}`, el, { type: reqs.eachType, required: true })
+
           if (!result[0].passed) {
             isEachChecked.passed = false
             isEachChecked.details = result[0].details || ''

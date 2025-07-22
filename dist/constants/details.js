@@ -8,4 +8,5 @@ export var ValidationDetails;
 (function (ValidationDetails) {
     ValidationDetails["OK"] = "OK";
     ValidationDetails["INVALID_DATE"] = "Invalid date";
+    ValidationDetails["CustomRuleFailed"] = "Custom rule failed";
 })(ValidationDetails || (ValidationDetails = {}));

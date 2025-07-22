@@ -199,3 +199,58 @@ describe('Тестирование обработки пропущенных с�
         })
     })
 })
+
+describe('Свойство required по умолчанию равно true', () => {
+    test('Свойство required по умолчанию равно true', () => {
+        const scheme = new Schema({
+            testKey: {
+                type: String
+            }
+        })
+
+        const obj = {}
+
+        const result = scheme.validate(obj)
+
+        expect(result).toEqual({
+            ok: false,
+            failed: ['testKey'],
+            missed: ['testKey'],
+            errors: ["Missing value for 'testKey'"],
+            passed: [],
+            byKeys: {
+                testKey: false
+            },
+            errorsByKeys: {
+                testKey: ["Missing value for 'testKey'"]
+            }
+        })
+    })
+
+    test('Свойство required=true корректно обрабатывается', () => {
+        const scheme = new Schema({
+            testKey: {
+                type: String,
+                required: true
+            }
+        })
+
+        const obj = {}
+
+        const result = scheme.validate(obj)
+
+        expect(result).toEqual({
+            ok: false,
+            failed: ['testKey'],
+            missed: ['testKey'],
+            errors: ["Missing value for 'testKey'"],
+            passed: [],
+            byKeys: {
+                testKey: false
+            },
+            errorsByKeys: {
+                testKey: ["Missing value for 'testKey'"]
+            }
+        })
+    })
+})

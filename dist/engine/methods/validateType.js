@@ -20,33 +20,34 @@ const validateUnionType = (key, value, requirements, keyName = key) => {
 };
 const handleTypeValidation = (key, value, requirements, keyName = key) => {
     var _a;
+    const reqs = Object.assign({ required: true }, requirements);
     const isNotNull = value !== null;
-    const keyTitle = 'title' in requirements ? requirements.title : keyName;
-    const hasCustomMessage = requirements.customMessage && typeof requirements.customMessage === 'function';
-    if (value === undefined && requirements.required) {
+    const keyTitle = 'title' in reqs && reqs.title !== undefined ? reqs.title : keyName;
+    const hasCustomMessage = reqs.customMessage && typeof reqs.customMessage === 'function';
+    if (value === undefined && reqs.required) {
         return [_validateType.getResult(keyName, false, _errors.getMissingError(keyName))];
     }
-    if (Array.isArray(requirements.type)) {
-        return [validateUnionType(key, value, requirements)];
+    if (Array.isArray(reqs.type)) {
+        return [validateUnionType(key, value, reqs)];
     }
-    if (value === undefined && requirements.required !== true) {
+    if (value === undefined && reqs.required === false) {
         return [_validateType.getResult(keyName, true)];
     }
     const customErrDetails = hasCustomMessage ?
-        requirements.customMessage({
+        reqs.customMessage({
             keyword: ValidationIds.Type,
             value: value,
             key: keyName,
             title: keyTitle,
-            reqs: requirements,
-            schema: null
+            reqs: reqs,
+            schema: {}
         }) :
         null;
-    const baseErrDetails = _errors.getErrorDetails(keyName, requirements.type, value);
+    const baseErrDetails = _errors.getErrorDetails(keyName, reqs.type, value);
     const getDetails = (isOK, errorText) => isOK ?
         ValidationDetails.OK :
         errorText || customErrDetails || baseErrDetails;
-    const typeBySchema = requirements.type;
+    const typeBySchema = reqs.type;
     const result = [];
     switch (typeBySchema) {
         case 'any': {
@@ -82,9 +83,9 @@ const handleTypeValidation = (key, value, requirements, keyName = key) => {
                 break;
             }
             let isEachChecked = { passed: true, details: "" };
-            if ('eachType' in requirements) {
+            if ('eachType' in reqs) {
                 for (const el of value) {
-                    const result = handleTypeValidation(`each of ${key}`, el, { type: requirements.eachType, required: true });
+                    const result = handleTypeValidation(`each of ${key}`, el, { type: reqs.eachType, required: true });
                     if (!result[0].passed) {
                         isEachChecked.passed = false;
                         isEachChecked.details = result[0].details || '';

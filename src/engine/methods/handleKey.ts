@@ -18,7 +18,7 @@ function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams
     const typeChecked: boolean[] = [];
     const rulesChecked: boolean[] = [];
 
-    if (hasMissing) {
+    if (hasMissing || !data) {
       return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
     }
 

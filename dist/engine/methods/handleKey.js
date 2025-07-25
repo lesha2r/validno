@@ -5,7 +5,7 @@ function validateKeyValue(params) {
     const missedCheck = [];
     const typeChecked = [];
     const rulesChecked = [];
-    if (hasMissing) {
+    if (hasMissing || !data) {
         return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
     }
     this.validateType({ results, key, value: data[key], reqs, nestedKey, typeChecked });

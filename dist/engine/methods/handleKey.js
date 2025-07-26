@@ -5,23 +5,22 @@ function validateKeyValue(params) {
     const missedCheck = [];
     const typeChecked = [];
     const rulesChecked = [];
-    if (hasMissing || !data) {
+    if (hasMissing) {
         return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
     }
-    this.validateType({ results, key, value: data[key], reqs, nestedKey, typeChecked });
-    this.validateRules({ results, nestedKey, value: data[key], reqs, data, rulesChecked });
+    const keyValue = data ? data[key] : undefined;
+    this.validateType({ results, key, value: keyValue, reqs, nestedKey, typeChecked });
+    this.validateRules({ results, nestedKey, value: keyValue, reqs, data, rulesChecked });
     return this.finishValidation({ results, nestedKey, missedCheck, typeChecked, rulesChecked });
 }
 function validateKey(input) {
-    let { results, key, nestedKey, data, reqs } = input;
+    let { results, key, nestedKey = key, data, reqs } = input;
     if (data === undefined) {
         const noDataResult = new ValidnoResult();
         noDataResult.setNoData(nestedKey);
     }
     if (!results)
         results = new ValidnoResult();
-    if (!nestedKey)
-        nestedKey = key;
     const hasMissing = _helpers.hasMissing(input);
     if (_helpers.checkNestedIsMissing(reqs, data)) {
         return this.handleMissingNestedKey(nestedKey, results);

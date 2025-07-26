@@ -14,22 +14,25 @@ export interface ValidateKeyDetailsParams {
 
 function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams) {
     const { results, key, nestedKey, data, reqs, hasMissing } = params;
+
     const missedCheck: boolean[] = [];
     const typeChecked: boolean[] = [];
     const rulesChecked: boolean[] = [];
 
-    if (hasMissing || !data) {
+    if (hasMissing) {
       return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
     }
 
-    this.validateType({results, key, value: data[key], reqs, nestedKey, typeChecked});
-    this.validateRules({results, nestedKey, value: data[key], reqs, data, rulesChecked});
+    const keyValue = data ? data[key] : undefined;
+
+    this.validateType({results, key, value: keyValue, reqs, nestedKey, typeChecked});
+    this.validateRules({results, nestedKey, value:  keyValue, reqs, data, rulesChecked});
 
     return this.finishValidation({results, nestedKey, missedCheck, typeChecked, rulesChecked});
 }
 
 function validateKey(this: ValidateEngine, input: KeyValidationDetails) {
-    let { results, key, nestedKey, data, reqs } = input;
+    let { results, key, nestedKey = key, data, reqs } = input;
 
     if (data === undefined) {
       const noDataResult = new ValidnoResult()
@@ -37,7 +40,6 @@ function validateKey(this: ValidateEngine, input: KeyValidationDetails) {
     }
 
     if (!results) results = new ValidnoResult();
-    if (!nestedKey) nestedKey = key;
 
     const hasMissing = _helpers.hasMissing(input);
 

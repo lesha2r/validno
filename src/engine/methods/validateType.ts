@@ -8,6 +8,7 @@ import { ValidationDetails, ValidationIds } from "../../constants/details.js";
 import _validations from "../../utils/validations.js";
 import _errors from "../../utils/errors.js";
 import _validateType, { TypeValidationResult } from "../../utils/validateType.js";
+import isObjectId from "../../utils/isObjectId.js";
 
 /**
  * Checks value against multiple possible types.
@@ -164,7 +165,10 @@ const handleTypeValidation = (
     default: {
       const isInstanceOf = typeof typeBySchema === 'function' && value instanceof typeBySchema
       const isConstructorSame = typeof typeBySchema === 'function' && value!.constructor?.name === typeBySchema?.name
-      const isOK = isInstanceOf && isConstructorSame
+
+      const isBothObjectId = isObjectId(value, typeBySchema)
+
+      const isOK = (isInstanceOf && isConstructorSame) || (isBothObjectId);
       result.push(_validateType.getResult(keyName, isOK, getDetails(isOK)))
     }
   }

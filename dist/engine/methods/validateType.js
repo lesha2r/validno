@@ -2,6 +2,7 @@ import { ValidationDetails, ValidationIds } from "../../constants/details.js";
 import _validations from "../../utils/validations.js";
 import _errors from "../../utils/errors.js";
 import _validateType from "../../utils/validateType.js";
+import isObjectId from "../../utils/isObjectId.js";
 const validateUnionType = (key, value, requirements, keyName = key) => {
     const typeList = Array.isArray(requirements.type)
         ? requirements.type.map((el) => String((el === null || el === void 0 ? void 0 : el.name) || el))
@@ -116,7 +117,8 @@ const handleTypeValidation = (key, value, requirements, keyName = key) => {
         default: {
             const isInstanceOf = typeof typeBySchema === 'function' && value instanceof typeBySchema;
             const isConstructorSame = typeof typeBySchema === 'function' && ((_a = value.constructor) === null || _a === void 0 ? void 0 : _a.name) === (typeBySchema === null || typeBySchema === void 0 ? void 0 : typeBySchema.name);
-            const isOK = isInstanceOf && isConstructorSame;
+            const isBothObjectId = isObjectId(value, typeBySchema);
+            const isOK = (isInstanceOf && isConstructorSame) || (isBothObjectId);
             result.push(_validateType.getResult(keyName, isOK, getDetails(isOK)));
         }
     }

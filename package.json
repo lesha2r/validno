@@ -1,6 +1,6 @@
 {
   "name": "validno",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A lightweight TypeScript validation library for runtime data validation.",
   "main": "dist/index.js",
   "scripts": {
@@ -22,7 +22,8 @@
     "@types/jest": "^29.5.13",
     "@types/node": "^18.14.2",
     "eslint": "^8.14.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "mongodb": "^6.19.0"
   },
   "directories": {
     "test": "tests"

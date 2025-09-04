@@ -310,6 +310,108 @@ describe('Тест _validations.isHex', () => {
     })
 });
 
+describe('Тест _validations.isStringNumber', () => {
+    test('Некорректные базовые значения не проходят проверку', () => {
+        const values = TypesAndValues.getValuesExcept([])
+        const isEveryFalse = checkEveryValue(values, _validations.isStringNumber, false)
+
+        expect(isEveryFalse).toBe(true)
+    })
+
+    test('Некорректные строковые значения не проходят проверку', () => {
+        const values = [
+            'abc',
+            '123abc',
+            'abc123',
+            '12.34.56',
+            '12..34',
+            '..',
+            '+',
+            '-',
+            'e5',
+            '1e',
+            '',
+            ' ',
+            '  ',
+            'NaN',
+            'Infinity',
+            '+Infinity',
+            '-Infinity',
+            '1.2.3',
+            '+-5',
+            '--5',
+            '++5'
+        ]
+
+        const isEveryFalse = checkEveryValue(values, _validations.isStringNumber, false)
+        expect(isEveryFalse).toBe(true)
+    })
+
+    test('Корректные целые числа проходят проверку', () => {
+        const values = [
+            '0',
+            '1',
+            '123',
+            '-1',
+            '-123',
+            '+1',
+            '+123'
+        ]
+        const isEveryTrue = checkEveryValue(values, _validations.isStringNumber, true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+
+    test('Корректные десятичные числа проходят проверку', () => {
+        const values = [
+            '0.1',
+            '10.01',
+            '123.456',
+            '-1.5',
+            '-123.789',
+            '+1.2',
+            '+123.001',
+            '.5',
+            '-.5',
+            '+.5'
+        ]
+        const isEveryTrue = checkEveryValue(values, _validations.isStringNumber, true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+
+    test('Корректные научные записи проходят проверку', () => {
+        const values = [
+            '1e5',
+            '1E5',
+            '1.5e10',
+            '1.5E10',
+            '-1e5',
+            '-1.5e10',
+            '+1e5',
+            '+1.5e10',
+            '1e-5',
+            '1e+5'
+        ]
+        const isEveryTrue = checkEveryValue(values, _validations.isStringNumber, true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+
+    test('Числа с пробелами вокруг проходят проверку', () => {
+        const values = [
+            ' 123 ',
+            ' 10.01 ',
+            '  -5.5  ',
+            '\t42\t',
+            '\n3.14\n'
+        ]
+        const isEveryTrue = checkEveryValue(values, _validations.isStringNumber, true)
+
+        expect(isEveryTrue).toBe(true)
+    })
+});
+
 describe('Тест _validations.lengthIs', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
         const res1 = _validations.lengthIs('x')

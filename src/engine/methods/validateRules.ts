@@ -69,6 +69,12 @@ const rulesFunctions: any = {
             details: `Value must be a valid email address`
         }
     },
+    isStringNumber: (key: string, val: any) => {
+        return {
+            result: _validations.isStringNumber(val),
+            details: `Value must be a string representing a valid number`
+        }
+    },
     is: (key: string, val: any, equalTo: any) => {
         return {
             result: _validations.is(val, equalTo),

@@ -46,6 +46,18 @@ class ValidationUtility {
         const regex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
         return regex.test(value);
     }
+    isStringNumber(value) {
+        if (typeof value !== 'string')
+            return false;
+        if (value.trim() === '')
+            return false;
+        const num = Number(value.trim());
+        if (isNaN(num))
+            return false;
+        const trimmedValue = value.trim();
+        const numericPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+        return numericPattern.test(trimmedValue) && isFinite(num);
+    }
     lengthIs(value, length) {
         if (typeof value !== 'string' && !Array.isArray(value))
             return false;

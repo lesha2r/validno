@@ -17,6 +17,7 @@ interface ValidationUtils {
   isEmail: (value: string) => boolean;
   isDateYYYYMMDD: (value: string) => boolean;
   isHex: (value: string) => boolean;
+  isStringNumber: (value: string) => boolean;
   
   // Length validations
   lengthIs: (value: string | any[], length: number) => boolean;
@@ -180,6 +181,36 @@ class ValidationUtility implements ValidationUtils {
   isHex(value: string): boolean {
     const regex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
     return regex.test(value);
+  }
+
+  /**
+   * Checks if a string represents a valid number (including decimals)
+   * @param value - String to validate
+   * @returns True if value represents a valid number
+   */
+  isStringNumber(value: string): boolean {
+    if (typeof value !== 'string') return false;
+    if (value.trim() === '') return false;
+    
+    // Use Number() constructor with some pre-checks
+    // This handles integers, floats, negative numbers, scientific notation
+    const num = Number(value.trim());
+    
+    // Number('') returns 0, Number(' ') returns 0, but we want these to be false
+    // Number() also converts some non-numeric strings, so we need additional checks
+    
+    // If it converts to NaN, it's not a valid number
+    if (isNaN(num)) return false;
+    
+    // Additional check: ensure the string only contains valid numeric characters
+    // This prevents cases like Number('123abc') which converts to NaN anyway,
+    // but also catches edge cases that Number() might handle unexpectedly
+    const trimmedValue = value.trim();
+    
+    // Allow: digits, optional single decimal point, optional leading +/-, scientific notation (e/E)
+    const numericPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
+    
+    return numericPattern.test(trimmedValue) && isFinite(num);
   }
 
   // LENGTH VALIDATIONS

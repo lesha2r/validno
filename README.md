@@ -2,6 +2,10 @@
 
 A lightweight and flexible TypeScript validation library for Node.js applications.
 
+## Documentation
+
+Check out docs at [https://validno.kodzero.pro](https://validno.kodzero.pro)
+
 ## Installation
 
 ```bash
@@ -515,3 +519,4 @@ const result = userSchema.validate<User>(newUser, ['name', 'email'])
 
 // ...or use automatic type inference based on the object
 const result = userSchema.validate(newUser, ['name', 'email'])
+```

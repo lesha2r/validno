@@ -3,7 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'Validno',
   description: 'A lightweight TypeScript validation library for runtime data validation',
-  base: '/validno/',
+  base: '/',
   
   head: [
     ['link', { rel: 'icon', href: '/validno/favicon.ico' }],

@@ -165,7 +165,7 @@ interface ValidnoResult {
 Joins all error messages into a single string.
 
 **Parameters:**
-- `separator` (optional): String to separate errors (default: `'\n'`)
+- `separator` (optional): String to separate errors (default: `'; '`)
 
 **Returns:** Joined error string
 

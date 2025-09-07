@@ -98,40 +98,6 @@ const orderSchema = new Schema({
 });
 ```
 
-## Optional Nested Objects
-
-Make entire nested objects optional:
-
-```javascript
-const userSchema = new Schema({
-  username: {
-    type: String,
-    required: true
-  },
-  profile: {
-    required: false, // Entire profile object is optional
-    bio: {
-      type: String,
-      required: false
-    },
-    avatar: {
-      type: String,
-      required: false,
-      rules: {
-        regex: /^https?:\/\/.+\.(jpg|jpeg|png|gif)$/
-      }
-    }
-  }
-});
-
-// Both of these are valid:
-const user1 = { username: "john" }; // No profile
-const user2 = { 
-  username: "jane", 
-  profile: { bio: "Hello world" } 
-};
-```
-
 ## Nested Arrays with Objects
 
 Validate arrays containing objects:
@@ -254,7 +220,6 @@ const orderSchema = new Schema({
   },
   
   shipping: {
-    required: false, // Optional shipping info
     method: {
       type: String,
       rules: {
@@ -405,7 +370,6 @@ const profileSchema = new Schema({
   
   // Optional social media links
   socialMedia: {
-    required: false,
     twitter: { type: String, required: false },
     linkedin: { type: String, required: false },
     github: { type: String, required: false }

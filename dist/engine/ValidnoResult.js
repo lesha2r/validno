@@ -19,12 +19,10 @@ class ValidnoResult {
     fixParentByChilds(parentKey, childChecks = []) {
         const isEveryOk = childChecks.every(check => check === true);
         this.setKeyStatus(parentKey, isEveryOk);
-        if (isEveryOk) {
+        if (isEveryOk)
             this.setPassed(parentKey);
-        }
-        else {
+        else
             this.setFailed(parentKey);
-        }
     }
     setMissing(key, errMsg) {
         const error = errMsg || _errors.getMissingError(key);

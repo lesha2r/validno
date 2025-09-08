@@ -14,6 +14,7 @@ function handleNestedKey(input) {
         results.merge(deepResults);
     }
     results.fixParentByChilds(nestedKey, nestedResults);
+    results.finish();
     return results;
 }
 export default handleNestedKey;

@@ -42,11 +42,8 @@ class ValidnoResult {
     const isEveryOk = childChecks.every(check => check === true);
     this.setKeyStatus(parentKey, isEveryOk);
 
-    if (isEveryOk) {
-        this.setPassed(parentKey);
-    } else {
-        this.setFailed(parentKey);
-    }
+    if (isEveryOk) this.setPassed(parentKey);
+    else this.setFailed(parentKey);
   }
 
   setMissing(key: string, errMsg?: string): void {

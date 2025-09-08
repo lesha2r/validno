@@ -31,7 +31,7 @@ function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams
     return this.finishValidation({results, nestedKey, missedCheck, typeChecked, rulesChecked});
 }
 
-function validateKey(this: ValidateEngine, input: KeyValidationDetails) {
+function validateKey(this: ValidateEngine, input: KeyValidationDetails): ValidnoResult {
     let { results, key, nestedKey = key, data, reqs } = input;
 
     if (data === undefined) {

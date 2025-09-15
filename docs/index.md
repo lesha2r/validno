@@ -5,6 +5,9 @@ hero:
   name: "Validno"
   text: "TypeScript Validation Library"
   tagline: "Lightweight and flexible runtime data validation for Node.js applications"
+  image:
+    src: "https://files.kodzero.pro/validno/validno-logo-large.svg"
+    alt: "Validno Logo"
   actions:
     - theme: brand
       text: Get Started

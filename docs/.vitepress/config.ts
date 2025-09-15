@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'Validno',
   description: 'A lightweight TypeScript validation library for runtime data validation',
   base: '/',
+  cleanUrls: true,
   
   head: [
     ['link', { rel: 'icon', href: '/validno/favicon.ico' }],

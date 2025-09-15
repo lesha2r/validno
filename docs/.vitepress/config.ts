@@ -57,7 +57,6 @@ export default defineConfig({
         text: 'Reference',
         items: [
           { text: 'API Reference', link: '/api-reference' },
-          { text: 'TypeScript Support', link: '/typescript-support' },
           { text: 'Built-in Utilities', link: '/built-in-utilities' }
         ]
       },
@@ -71,7 +70,8 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/lesha2r/validno' }
+      { icon: 'github', link: 'https://github.com/lesha2r/validno' },
+      { icon: 'npm', link: 'https://www.npmjs.com/package/validno' }
     ],
 
     footer: {

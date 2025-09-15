@@ -498,5 +498,4 @@ const logValidationResult = (result, context = {}) => {
 ## Next Steps
 
 - Learn about [Built-in Utilities](/built-in-utilities) for additional validation helpers
-- Explore [TypeScript Support](/typescript-support) for type-safe validation results
 - See [Advanced Examples](/advanced-examples) for complex validation scenarios

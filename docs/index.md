@@ -15,6 +15,10 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/lesha2r/validno
+    - theme: alt
+      text: View on NPM
+      link: https://www.npmjs.com/package/validno
+      
 
 features:
   - title: Type Safe

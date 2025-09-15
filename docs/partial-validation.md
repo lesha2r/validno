@@ -457,4 +457,3 @@ const createValidationMiddleware = (schema) => {
 
 - Learn about [Validation Results](/validation-results) to understand partial validation outcomes
 - Explore [Custom Messages](/custom-messages) for better partial validation feedback
-- See [TypeScript Support](/typescript-support) for type-safe partial validation

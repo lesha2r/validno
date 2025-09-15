@@ -1303,4 +1303,3 @@ const validateFormField = async (formId, fieldName, value) => {
 
 - Review [API Reference](/api-reference) for complete documentation
 - Explore [Built-in Utilities](/built-in-utilities) for additional validation helpers
-- See [TypeScript Support](/typescript-support) for type-safe advanced patterns

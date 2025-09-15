@@ -443,6 +443,5 @@ No breaking changes in the public API. All existing code should work without mod
 
 ## Next Steps
 
-- See [TypeScript Support](/typescript-support) for advanced type usage
 - Explore [Built-in Utilities](/built-in-utilities) for standalone validation functions
 - Check [Advanced Examples](/advanced-examples) for complex use cases

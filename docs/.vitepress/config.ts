@@ -15,7 +15,8 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/getting-started' },
       { text: 'API', link: '/api-reference' },
-      { text: 'Examples', link: '/examples' }
+      { text: 'Examples', link: '/examples' },
+      { text: 'npm', link: 'https://www.npmjs.com/package/validno' }
     ],
 
     sidebar: [

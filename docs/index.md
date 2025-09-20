@@ -6,18 +6,18 @@ hero:
   text: "TypeScript Validation Library"
   tagline: "Lightweight and flexible runtime data validation for Node.js applications"
   image:
-    src: "https://files.kodzero.pro/validno/validno-logo-large.svg"
+    src: ./logo-large.svg
     alt: "Validno Logo"
   actions:
     - theme: brand
       text: Get Started
       link: /getting-started
     - theme: alt
-      text: View on GitHub
+      text: GitHub
       link: https://github.com/lesha2r/validno
     - theme: alt
-      text: View on NPM
-      link: https://www.npmjs.com/package/validno
+      text: npm
+      link: https://npmjs.com/package/validno
       
 
 features:
@@ -88,3 +88,5 @@ if (result.ok) {
 ```bash
 npm i validno
 ```
+
+<!--@include: ./includes/team.md -->

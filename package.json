@@ -1,6 +1,6 @@
 {
   "name": "validno",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "A lightweight TypeScript validation library for runtime data validation. Used as part of Kodzero API framework.",
   "main": "dist/index.js",
   "scripts": {

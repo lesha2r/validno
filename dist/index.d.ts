@@ -43,5 +43,6 @@ export declare const validations: {
     readonly test: (value: string, regexp: RegExp) => boolean;
 };
 export { ValidnoResult, Schema };
+export type { ValidnoResult as ValidnoResultType };
 export default Schema;
 //# sourceMappingURL=index.d.ts.map

@@ -4,7 +4,7 @@ import ValidnoResult from "./engine/ValidnoResult.js";
 
 // Extras. Named exports
 export const validations = _validations
-export { ValidnoResult }
+export { ValidnoResult, Schema }
 
 // Default
 export default Schema

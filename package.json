@@ -9,6 +9,7 @@
     "tscw": "tsc --b --watch src/",
     "dev": "nodemon dist/dev.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:docs": "npx tsc docs-test.ts --module esnext --target es2020 --moduleResolution node --esModuleInterop && node docs-test.js",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"

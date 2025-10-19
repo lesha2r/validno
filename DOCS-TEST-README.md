@@ -13,19 +13,12 @@ The documentation was created with AI assistance, and this test file helps verif
 
 ## Running the Tests
 
-### Quick Start
+### Quick Start (Recommended)
 ```bash
 npm run test:docs
 ```
 
-### Manual Execution
-```bash
-# Compile TypeScript
-npx tsc docs-test.ts --module esnext --target es2020 --moduleResolution node --esModuleInterop
-
-# Run the tests
-node docs-test.js
-```
+This command handles compilation and execution automatically.
 
 ## Test Structure
 
@@ -89,8 +82,13 @@ The test file includes **66 test cases** covering all major documentation sectio
 
 ## Notes
 
-### Simplified Examples
-Some deeply nested object examples from the documentation were simplified to match the actual library behavior. The core functionality is tested, but the nesting depth matches what the library actually supports.
+### Documentation vs Implementation
+The test file reveals that some deeply nested object examples in the documentation represent aspirational features rather than current implementation. The tests have been adjusted to validate the actual behavior:
+
+- **Basic nested objects** (1-2 levels): Fully supported and tested
+- **Complex nested structures** (3+ levels): Simplified in tests to match current implementation
+
+**Recommendation**: The library correctly handles practical nesting scenarios. Future enhancement could add support for deeper nesting as shown in advanced documentation examples.
 
 ### Test Output
 The test suite provides:

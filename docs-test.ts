@@ -5,11 +5,9 @@
  * to ensure all methods described in the docs are correct and working.
  * 
  * HOW TO RUN:
- * 1. Compile TypeScript: npx tsc docs-test.ts --module esnext --target es2020 --moduleResolution node --esModuleInterop
- * 2. Run the test: node docs-test.js
+ * npm run test:docs
  * 
- * Or in one command:
- * npx tsc docs-test.ts --module esnext --target es2020 --moduleResolution node --esModuleInterop && node docs-test.js
+ * See DOCS-TEST-README.md for detailed documentation.
  * 
  * Each test includes:
  * - Comments about the documentation section where the method is described

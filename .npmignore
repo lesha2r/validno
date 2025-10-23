@@ -4,3 +4,4 @@ jest.config.ts
 .eslintrc.*
 todos.md
 docs
+dev.*s

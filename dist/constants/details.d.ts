@@ -5,7 +5,8 @@ export declare enum ValidationIds {
 }
 export declare enum ValidationDetails {
     OK = "OK",
-    INVALID_DATE = "Invalid date",
-    CustomRuleFailed = "Custom rule failed"
+    InvalidDate = "Invalid date",
+    CustomRuleFailed = "Custom rule failed",
+    BadInput = "Validation input must be a plain object"
 }
 //# sourceMappingURL=details.d.ts.map

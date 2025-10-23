@@ -69,7 +69,7 @@ const handleTypeValidation = (key, value, requirements, keyName = key) => {
             const isDate = isNotNull && value.constructor === Date;
             const isValid = isDate && !isNaN(value.getTime());
             const isValidDate = isDate && isValid;
-            result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, ValidationDetails.INVALID_DATE)));
+            result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, ValidationDetails.InvalidDate)));
             break;
         }
         case Boolean: {

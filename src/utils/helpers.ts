@@ -151,6 +151,7 @@ class HelperUtility implements HelperUtils {
       keys2.includes(key) && this.deepEqual(value1[key], value2[key])
     );
   }
+
 }
 
 const helpers = new HelperUtility();

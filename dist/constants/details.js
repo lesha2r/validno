@@ -7,6 +7,7 @@ export var ValidationIds;
 export var ValidationDetails;
 (function (ValidationDetails) {
     ValidationDetails["OK"] = "OK";
-    ValidationDetails["INVALID_DATE"] = "Invalid date";
+    ValidationDetails["InvalidDate"] = "Invalid date";
     ValidationDetails["CustomRuleFailed"] = "Custom rule failed";
+    ValidationDetails["BadInput"] = "Validation input must be a plain object";
 })(ValidationDetails || (ValidationDetails = {}));

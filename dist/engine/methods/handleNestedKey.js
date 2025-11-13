@@ -5,7 +5,7 @@ function handleNestedKey(input) {
     for (const itemKey of nestedKeys) {
         const deepParams = {
             key: itemKey,
-            data: data[key],
+            data: data ? data[key] : undefined,
             reqs: reqs[itemKey],
             nestedKey: `${nestedKey}.${itemKey}`
         };

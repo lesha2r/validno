@@ -9,7 +9,7 @@ function handleNestedKey(this: ValidateEngine, input: KeyValidationDetails) {
     for (const itemKey of nestedKeys) {
       const deepParams: KeyValidationDetails = {
         key: itemKey,
-        data: data[key],
+        data: data ? data[key] : undefined,
         // @ts-ignore
         reqs: reqs[itemKey],
         nestedKey: `${nestedKey}.${itemKey}`

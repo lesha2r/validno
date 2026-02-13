@@ -8,7 +8,7 @@ export interface ValidateRulesInput {
     data: any;
     rulesChecked: boolean[];
 }
-export declare type Rule = Record<string, any>;
+export type Rule = Record<string, any>;
 export declare const rulesParams: {
     lengthMin: {
         allowedTypes: StringConstructor[];

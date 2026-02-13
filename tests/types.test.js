@@ -315,4 +315,30 @@ describe("Проверка всех типов сразу", () => {
         expect(hasErrorMsg.every(el => el === true)).toBe(true)
         expect(res.errors.length).toBe(Object.keys(obj).length)
     })
+
+    test('Тест null значения не вызывает ошибку при валидации типа String', () => {
+        // Test case from issue: ensure null value doesn't throw an error
+        const schema = new Schema({
+            anyKey: {
+                type: String
+            }
+        })
+
+        const objWithNull = {
+            anyKey: null
+        }
+
+        // Should not throw an error
+        const result = schema.validate(objWithNull)
+
+        // Validation should fail (null is not a String)
+        expect(result.ok).toBe(false)
+        expect(result.failed.includes('anyKey')).toBe(true)
+        expect(result.byKeys['anyKey']).toBe(false)
+        
+        // Should have an error message
+        expect(result.errors.length).toBeGreaterThan(0)
+        expect(result.errorsByKeys['anyKey']).toBeDefined()
+        expect(result.errorsByKeys['anyKey'].length).toBeGreaterThan(0)
+    })
 })

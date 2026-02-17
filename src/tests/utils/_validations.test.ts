@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import _validations from '../../dist/utils/validations.js';
+import _validations from '../../utils/validations';
 
 class TypesAndValues {
     constructor() {
@@ -18,29 +18,29 @@ class TypesAndValues {
         hex: '#fbec84',
     }
 
-    static getValues = (types = []) => {
-        let output = []
+    static getValues = (types: string[] = []) => {
+        let output: any[] = []
 
         for (const key of types) {
-            if (key in this.list) output.push(this.list[key])
+            if (key in this.list) output.push(this.list[key as keyof typeof this.list])
         }
 
         return output
     }
 
-    static getValuesExcept = (except = []) => {
+    static getValuesExcept = (except: string[] = []) => {
         const output = {
             ...this.list
         }
     
-        except.forEach(key => delete output[key])
+        except.forEach(key => delete output[key as keyof typeof output])
     
         return Object.values(output)
     }
 }
 
-const checkEveryValue = (values, func, expected = true) => {
-    const results = {}
+const checkEveryValue = (values: any[], func: (v: any) => any, expected = true) => {
+    const results: any = {}
 
     for (const v of values) {
         const isChecked = func(v)
@@ -48,7 +48,7 @@ const checkEveryValue = (values, func, expected = true) => {
         results[v] = isChecked
     }
 
-    return Object.values(results).every(e => e === expected)
+    return Object.values(results).every((e: any) => e === expected)
 }
 
 describe('Тест _validations.isString', () => {
@@ -312,8 +312,8 @@ describe('Тест _validations.isHex', () => {
 
 describe('Тест _validations.lengthIs', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.lengthIs('x')
-        const res2 = _validations.lengthIs()
+        const res1 = (_validations.lengthIs as any)('x')
+        const res2 = (_validations.lengthIs as any)(undefined)
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -326,14 +326,14 @@ describe('Тест _validations.lengthIs', () => {
             ...TypesAndValues.getValuesExcept(['string'])
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.lengthIs(v, 10), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.lengthIs(v, 10), false)
 
         expect(isEveryFalse).toBe(true)
     })
 
     test('Корректные значения проходят проверку', () => {
         const values = ['abc']
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.lengthIs(v, 3), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.lengthIs(v, 3), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -341,8 +341,8 @@ describe('Тест _validations.lengthIs', () => {
 
 describe('Тест _validations.lengthNot', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.lengthNot('x')
-        const res2 = _validations.lengthNot()
+        const res1 = (_validations.lengthNot as any)('x')
+        const res2 = (_validations.lengthNot as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -354,7 +354,7 @@ describe('Тест _validations.lengthNot', () => {
             ['1', '2']
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.lengthNot(v, 2), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.lengthNot(v, 2), false)
 
         expect(isEveryFalse).toBe(true)
     })
@@ -366,7 +366,7 @@ describe('Тест _validations.lengthNot', () => {
             ['1', '2', '3', '4', '5', '6', '7'],
             ['1', '2', '3', '4', '5', '6', '7', '9']
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.lengthNot(v, 2), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.lengthNot(v, 2), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -374,8 +374,8 @@ describe('Тест _validations.lengthNot', () => {
 
 describe('Тест _validations.lengthMin', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.lengthMin('x')
-        const res2 = _validations.lengthMin()
+        const res1 = (_validations.lengthMin as any)('x')
+        const res2 = (_validations.lengthMin as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -387,7 +387,7 @@ describe('Тест _validations.lengthMin', () => {
             ['a', 'b']
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.lengthMin(v, 3), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.lengthMin(v, 3), false)
 
         expect(isEveryFalse).toBe(true)
     })
@@ -399,7 +399,7 @@ describe('Тест _validations.lengthMin', () => {
             ['1', '2', '3'],
             ['1', '2', '3', '4']
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.lengthMin(v, 3), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.lengthMin(v, 3), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -407,8 +407,8 @@ describe('Тест _validations.lengthMin', () => {
 
 describe('Тест _validations.lengthMax', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.lengthMax('x')
-        const res2 = _validations.lengthMax()
+        const res1 = (_validations.lengthMax as any)('x')
+        const res2 = (_validations.lengthMax as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -420,7 +420,7 @@ describe('Тест _validations.lengthMax', () => {
             ['a', 'b', 'c']
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.lengthMax(v, 2), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.lengthMax(v, 2), false)
 
         expect(isEveryFalse).toBe(true)
         
@@ -433,7 +433,7 @@ describe('Тест _validations.lengthMax', () => {
             ['1', '2', '3'],
             ['1', '2']
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.lengthMax(v, 3), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.lengthMax(v, 3), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -441,8 +441,8 @@ describe('Тест _validations.lengthMax', () => {
 
 describe('Тест _validations.isNumberGte', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isNumberGte(1)
-        const res2 = _validations.isNumberGte()
+        const res1 = (_validations.isNumberGte as any)(1)
+        const res2 = (_validations.isNumberGte as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -455,7 +455,7 @@ describe('Тест _validations.isNumberGte', () => {
             3
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.isNumberGte(v, 4), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.isNumberGte(v, 4), false)
 
         expect(isEveryFalse).toBe(true)
         
@@ -467,7 +467,7 @@ describe('Тест _validations.isNumberGte', () => {
             5,
             6
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.isNumberGte(v, 4), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.isNumberGte(v, 4), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -475,8 +475,8 @@ describe('Тест _validations.isNumberGte', () => {
 
 describe('Тест _validations.isNumberGt', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isNumberGt(1)
-        const res2 = _validations.isNumberGt()
+        const res1 = (_validations.isNumberGt as any)(1)
+        const res2 = (_validations.isNumberGt as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -489,7 +489,7 @@ describe('Тест _validations.isNumberGt', () => {
             3
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => {
+        const isEveryFalse = checkEveryValue(values, (v: any) => {
             return _validations.isNumberGt(v, 3)
         }, false)
 
@@ -503,7 +503,7 @@ describe('Тест _validations.isNumberGt', () => {
             5,
             6
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => {
+        const isEveryTrue = checkEveryValue(values, (v: any) => {
             return _validations.isNumberGt(v, 3)
         }, true)
 
@@ -513,8 +513,8 @@ describe('Тест _validations.isNumberGt', () => {
 
 describe('Тест _validations.isNumberLte', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isNumberLte(1)
-        const res2 = _validations.isNumberLte()
+        const res1 = (_validations.isNumberLte as any)(1)
+        const res2 = (_validations.isNumberLte as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -527,7 +527,7 @@ describe('Тест _validations.isNumberLte', () => {
             6
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.isNumberLte(v, 3), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.isNumberLte(v, 3), false)
 
         expect(isEveryFalse).toBe(true)
         
@@ -539,7 +539,7 @@ describe('Тест _validations.isNumberLte', () => {
             2,
             3
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.isNumberLte(v, 3), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.isNumberLte(v, 3), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -551,8 +551,8 @@ describe('Тест _validations.isNumberLte', () => {
 
 describe('Тест _validations.isNumberLt', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isNumberLt(1)
-        const res2 = _validations.isNumberLt()
+        const res1 = (_validations.isNumberLt as any)(1)
+        const res2 = (_validations.isNumberLt as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -565,7 +565,7 @@ describe('Тест _validations.isNumberLt', () => {
             6
         ]
 
-        const isEveryFalse = checkEveryValue(values, (v) => _validations.isNumberLt(v, 4), false)
+        const isEveryFalse = checkEveryValue(values, (v: any) => _validations.isNumberLt(v, 4), false)
 
         expect(isEveryFalse).toBe(true)
         
@@ -577,7 +577,7 @@ describe('Тест _validations.isNumberLt', () => {
             2,
             3
         ]
-        const isEveryTrue = checkEveryValue(values, (v) => _validations.isNumberLt(v, 4), true)
+        const isEveryTrue = checkEveryValue(values, (v: any) => _validations.isNumberLt(v, 4), true)
 
         expect(isEveryTrue).toBe(true)
     })
@@ -591,8 +591,8 @@ describe('Тест _validations.hasKey', () => {
     const testKey = 'xyz'
 
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.hasKey({})
-        const res2 = _validations.hasKey()
+        const res1 = (_validations.hasKey as any)({})
+        const res2 = (_validations.hasKey as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -607,7 +607,7 @@ describe('Тест _validations.hasKey', () => {
 
         const isEveryFalse = checkEveryValue(
             values,
-            (v) => _validations.hasKey(v, testKey),
+            (v: any) => _validations.hasKey(v, testKey),
             false
         )
 
@@ -624,7 +624,7 @@ describe('Тест _validations.hasKey', () => {
 
         const isEveryTrue = checkEveryValue(
             values,
-            (v) => _validations.hasKey(v, testKey),
+            (v: any) => _validations.hasKey(v, testKey),
             true
         )
 
@@ -634,12 +634,12 @@ describe('Тест _validations.hasKey', () => {
 
 describe('Тест _validations.is', () => {
     test('Отсутствие аргументов вызывает корректный ответ', () => {
-        expect(_validations.is('a')).toBe(false)
-        expect(_validations.is()).toBe(true)
+        expect((_validations.is as any)('a')).toBe(false)
+        expect((_validations.is as any)()).toBe(true)
     })
 
     test('Несовпадающие значения возвращает false при проверке', () => {
-        const results = []
+        const results: unknown[] = []
 
         const toBeChecked = [
             ['string', 'string2'],
@@ -676,7 +676,7 @@ describe('Тест _validations.is', () => {
             dates: [dateA, dateB]            
         }
 
-        const results = {}
+        const results: any = {}
 
         for (const [key, values] of Object.entries(toBeChecked)) {
             results[key] = _validations.is(values[0], values[1])
@@ -699,12 +699,12 @@ describe('Тест _validations.is', () => {
 
 describe('Тест _validations.not', () => {
     test('Отсутствие аргументов вызывает корректный ответ', () => {
-        expect(_validations.not('a')).toBe(true)
-        expect(_validations.not()).toBe(false)
+        expect((_validations.not as any)('a')).toBe(true)
+        expect((_validations.not as any)()).toBe(false)
     })
 
     test('Несовпадающие значения возвращает true при проверке', () => {
-        const results = []
+        const results: unknown[] = []
 
         const toBeChecked = [
             ['string', 'string2'],
@@ -741,7 +741,7 @@ describe('Тест _validations.not', () => {
             dates: [dateA, dateB]            
         }
 
-        const results = {}
+        const results: any = {}
 
         for (const [key, values] of Object.entries(toBeChecked)) {
             results[key] = _validations.not(values[0], values[1])
@@ -766,12 +766,12 @@ describe('Тест _validations.not', () => {
 
 describe('Тест _validations.regexp', () => {
     test('Отсутствие аргументов вызывает корректный ответ', () => {
-        expect(() => _validations.regexp('a')).toThrow()
-        expect(() => _validations.regexp()).toThrow()
+        expect(() => (_validations.regexp as any)('a')).toThrow()
+        expect(() => (_validations.regexp as any)()).toThrow()
     })
 
     test('Несовпадающие значения возвращает false при проверке', () => {
-        const results = []
+        const results: unknown[] = []
 
         const toBeChecked = [
             ['string', /^xxstr.*/],
@@ -780,7 +780,7 @@ describe('Тест _validations.regexp', () => {
         ]
 
         toBeChecked.forEach(arr => {
-            results.push(_validations.regexp(arr[0], arr[1]))
+            results.push((_validations.regexp as any)(arr[0], arr[1]))
         })
 
         const isEveryTrue = Object.values(results).every(v => v === false)
@@ -788,7 +788,7 @@ describe('Тест _validations.regexp', () => {
     })
 
     test('Совпадающие значения возвращают true при проверке', () => {
-        const results = []
+        const results: any[] = []
 
         const toBeChecked = [
             ['string', /^str.*/],
@@ -798,7 +798,7 @@ describe('Тест _validations.regexp', () => {
         ]
 
         toBeChecked.forEach(arr => {
-            results.push(_validations.regexp(arr[0], arr[1]))
+            results.push((_validations.regexp as any)(arr[0], arr[1]))
         })
 
         const isEveryTrue = Object.values(results).every(v => v === true)
@@ -814,8 +814,8 @@ describe('Тест _validations.regexp', () => {
 
 describe('Тест _validations.isDateLte', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isDateLte(new Date())
-        const res2 = _validations.isDateLte()
+        const res1 = (_validations.isDateLte as any)(new Date())
+        const res2 = (_validations.isDateLte as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -858,8 +858,8 @@ describe('Тест _validations.isDateLte', () => {
 
 describe('Тест _validations.isDateLt', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isDateLt(new Date())
-        const res2 = _validations.isDateLt()
+        const res1 = (_validations.isDateLt as any)(new Date())
+        const res2 = (_validations.isDateLt as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -901,8 +901,8 @@ describe('Тест _validations.isDateLt', () => {
 
 describe('Тест _validations.isDateGte', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isDateGte(new Date())
-        const res2 = _validations.isDateGte()
+        const res1 = (_validations.isDateGte as any)(new Date())
+        const res2 = (_validations.isDateGte as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)
@@ -945,8 +945,8 @@ describe('Тест _validations.isDateGte', () => {
 
 describe('Тест _validations.isDateLt', () => {
     test('Отсутствие аргументов вызывает ответ false', () => {
-        const res1 = _validations.isDateLt(new Date())
-        const res2 = _validations.isDateLt()
+        const res1 = (_validations.isDateLt as any)(new Date())
+        const res2 = (_validations.isDateLt as any)()
 
         expect(res1).toBe(false)
         expect(res2).toBe(false)

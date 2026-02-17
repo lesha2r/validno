@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../../dist/Schema.js';
+import { Schema } from '../../Schema';
 
 describe('Data input is not an object → returns failed validation result', () => {
     const schema = new Schema({

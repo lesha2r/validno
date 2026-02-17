@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
-import _errors from '../dist/utils/errors.js';
+import { Schema } from '../Schema';
+import _errors from '../utils/errors';
 
 describe('Тестирование функции joinErrors', () => {
     const keys = ['ops1', 'ops2', 'miss']

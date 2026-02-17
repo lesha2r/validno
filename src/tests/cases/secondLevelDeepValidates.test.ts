@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../../dist/Schema.js';
+import { Schema } from '../../Schema';
 
 // [Case]
 // Second level deep validation fails main parent even if all childs are valid
@@ -214,24 +214,22 @@ const exampleConfigFile = {
 };
 
 describe('Second level deep validates as expected', () => {
-  const res = configSchema.validate(exampleConfigFile);
-
   test('should validate the api key', () => {
+    const res = configSchema.validate(exampleConfigFile);
     expect(res.ok).toBe(true);
     expect(res.failed).toEqual([]);
     expect(res.missed).toEqual([]);
   });
 
+  test('api key shouldn\'t validate with wrong port type', () => {
     const res2 = configSchema.validate({
         ...exampleConfigFile,
         api: {
             ...exampleConfigFile.api,
-            port: '99999'
+            port: '99999' as any
         }
     })
-
-    test('api key shouldn\'t validate with wrong port type', () => {
-        expect(res2.ok).toBe(false);
-        expect(res2.failed).toContain('api');
-    });
+    expect(res2.ok).toBe(false);
+    expect(res2.failed).toContain('api');
+  });
 });

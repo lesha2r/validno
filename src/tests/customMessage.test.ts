@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
-import _errors from '../dist/utils/errors.js';
+import { Schema } from '../Schema';
+import _errors from '../utils/errors';
 
 describe('Тестирование кастомного сообщения об ошибке', () => {
     test('Кастомные сообщения корректно отображаются в результате валидации', () => {
@@ -19,7 +19,7 @@ describe('Тестирование кастомного сообщения об 
             wrongRule3
         ]
 
-        const getCustomMsg = (key, variation = '') => key + ' custom' + variation
+        const getCustomMsg = (key: string, variation = '') => key + ' custom' + variation
 
         const schema = new Schema({
             [wrongTypeKey]: {

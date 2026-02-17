@@ -1,5 +1,5 @@
 import {expect, test} from '@jest/globals';
-import _errors from '../../dist/utils/errors.js';
+import _errors from '../../utils/errors';
 
 test('Тест _errors.getMissingError', () => {
     const key = 'testKey'
@@ -14,7 +14,7 @@ test('Тест _errors.joinErrors', () => {
     const defaultSeparator = '; '
     const customSeparator = '||'
 
-    const emptyErrorMsg = _errors.joinErrors()
+    const emptyErrorMsg = _errors.joinErrors([] as any)
     const oneErrorMsg = _errors.joinErrors(['X'])
     const multipleErrorMsg = _errors.joinErrors(['X', 'Y', 'Z'])
     const customSeparatorErrorMsg = _errors.joinErrors(['X', 'Y', 'Z'], customSeparator)
@@ -40,11 +40,11 @@ test('Тест _errors.getErrorDetails', () => {
     const errorObject = _errors.getErrorDetails(key, Object, [])
     const errorBoolean = _errors.getErrorDetails(key, Boolean, 190)
     const errorCustom = _errors.getErrorDetails(key, Object, customObj)
-    const errorUnknown = _errors.getErrorDetails(key, Number)
+    const errorUnknown = _errors.getErrorDetails(key, Number, undefined as any)
 
     const okCustom = _errors.getErrorDetails(key, CustomTest, customObj)
 
-    const getError = (key, expected, received) => {
+    const getError = (key: string, expected: any, received: string) => {
         return `Check the type of '${key}': expected ${expected}, received ${received}`;
     }
 

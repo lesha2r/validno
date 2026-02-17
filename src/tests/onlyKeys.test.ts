@@ -1,5 +1,5 @@
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
+import { Schema } from '../Schema';
 
 describe('Параметр onlyKeys возвращает корректный результат валидации объекта', () => {
     const schema = new Schema({
@@ -70,7 +70,7 @@ describe('Параметр onlyKeys возвращает корректный р
             }
         }
 
-        const keyToCheck = ['str', 'obj']
+        const keyToCheck = ['str', 'obj'] as any
 
         const result = schema.validate(obj, keyToCheck)
 

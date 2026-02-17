@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
-import _errors from '../dist/utils/errors.js';
+import { Schema } from '../Schema';
+import _errors from '../utils/errors';
 
 class Parent {
-    constructor(value) {
+    constructor(value: any) {
         this.value = value;
         this.version = 1;
     }
+
+    value: any
+    version: number
 
     getV() {
         return this.version
@@ -15,15 +18,17 @@ class Parent {
 }
 
 class Child extends Parent {
-    constructor(value) {
+    constructor(value: any) {
         super(value);
 
         this.isDeep = true;
     }
+
+    isDeep: boolean
 }
 
 class CustomString extends String {
-    constructor(value) {
+    constructor(value: any) {
         super(value);
     }
 

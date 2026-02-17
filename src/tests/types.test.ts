@@ -1,5 +1,5 @@
+import { Schema } from '../Schema';
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
 
 describe('Проверка каждого типа по отдельности', () => {
     test('Тест String', () => {
@@ -250,7 +250,7 @@ describe("Проверка всех типов сразу", () => {
 
         const res = schema.validate(obj)
 
-        const arePassed = []
+        const arePassed: boolean[] = []
         for (const key in obj) {
             arePassed.push(res.byKeys[key])
         }
@@ -303,8 +303,8 @@ describe("Проверка всех типов сразу", () => {
         const res = schema.validate(obj)
         expect(res.ok).toBe(false)
 
-        const areFailed = []
-        const hasErrorMsg = []
+        const areFailed: boolean[] = []
+        const hasErrorMsg: boolean[] = []
 
         for (const key in obj) {
             areFailed.push(res.byKeys[key])

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../../dist/Schema.js';
+import { Schema } from '../../Schema';
 
 // [Case]
 // Not required nested key

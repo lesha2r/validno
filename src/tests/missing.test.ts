@@ -1,6 +1,6 @@
 import {describe, expect, test} from '@jest/globals';
-import { Schema } from '../dist/Schema.js';
-import _errors from '../dist/utils/errors.js';
+import { Schema } from '../Schema';
+import _errors from '../utils/errors';
 
 describe('Тестирование обработки пропущенных свойста', () => {
     test('Отсутствующий ключ правильно отображается в результате', () => {

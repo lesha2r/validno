@@ -163,9 +163,13 @@ const handleTypeValidation = (
       break
     }
     default: {
+      if (value === null && typeBySchema !== null) {
+        result.push(_validateType.getResult(keyName, false, getDetails(false)))
+        break
+      }
+
       const isInstanceOf = typeof typeBySchema === 'function' && value instanceof typeBySchema
       const isConstructorSame = typeof typeBySchema === 'function' && value!.constructor?.name === typeBySchema?.name
-
       const isBothObjectId = isObjectId(value, typeBySchema)
 
       const isOK = (isInstanceOf && isConstructorSame) || (isBothObjectId);

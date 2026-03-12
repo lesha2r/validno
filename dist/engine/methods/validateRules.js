@@ -70,33 +70,34 @@ const rulesFunctions = {
     length: (key, val, length) => {
         return {
             result: _validations.lengthIs(val, length),
-            details: `Value must be equal to ${length}`
+            details: `Value length must be equal to ${length} ${Array.isArray(val) ? 'items' : 'characters'}`
         };
     },
     lengthNot: (key, val, lengthNot) => {
         return {
             result: _validations.lengthNot(val, lengthNot),
-            details: `Value must not be equal to ${lengthNot}`
+            details: `Value must not be equal to ${lengthNot} ${Array.isArray(val) ? 'items' : 'characters'}`
         };
     },
     lengthMinMax: (key, val, minMax) => {
         const [min, max] = minMax;
         return {
             result: _validations.lengthMin(val, min) && _validations.lengthMax(val, max),
-            details: `Value must be between ${min} and ${max} characters`
+            details: `Value must be between ${min} and ${max} ${Array.isArray(val) ? 'items' : 'characters'}`
         };
     },
     lengthMin: (key, val, min) => {
         ensureRuleHasCorrectType(val, rulesParams['lengthMin'].allowedTypes);
         return {
             result: _validations.lengthMin(val, min),
-            details: `Value must be at least ${min} characters`
+            details: `Value must have at least ${min} ${Array.isArray(val) ? 'items' : 'characters'}`
         };
     },
     lengthMax: (key, val, max) => {
+        ensureRuleHasCorrectType(val, rulesParams['lengthMin'].allowedTypes);
         return {
             result: _validations.lengthMax(val, max),
-            details: `Value must not be exceed ${max} characters`
+            details: `Value must not exceed ${max} ${Array.isArray(val) ? 'items' : 'characters'}`
         };
     },
     regex: (key, val, regex) => {

@@ -9,19 +9,25 @@ function handleMissingKey(schema: Schema, input: KeyValidationDetails) {
   const messageKey = nestedKey || key;
   const messageTitle = reqs.title || messageKey;
 
-  if (!reqs.customMessage) return _errors.getMissingError(messageKey);
+  // Priority: customMessage callback > requiredMessage shorthand > default error
+  if (reqs.customMessage && typeof reqs.customMessage === 'function') {
+    // @ts-ignore
+    const errorMessage = reqs.customMessage({
+      keyword: ValidationIds.Missing,
+      value: data[key],
+      key: messageKey,
+      title: messageTitle,
+      reqs,
+      schema,
+    });
+    return errorMessage;
+  }
 
-  // @ts-ignore
-  const errorMessage = reqs.customMessage({
-    keyword: ValidationIds.Missing,
-    value: data[key],
-    key: messageKey,
-    title: messageTitle,
-    reqs,
-    schema,
-  });
+  if (reqs.requiredMessage && typeof reqs.requiredMessage === 'string') {
+    return reqs.requiredMessage;
+  }
 
-  return errorMessage;
+  return _errors.getMissingError(messageKey);
 }
 
 export default handleMissingKey;

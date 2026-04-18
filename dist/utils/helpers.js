@@ -9,6 +9,9 @@ class HelperUtility {
         return !objKeys.every(key => defaultSchemaKeys.includes(key));
     }
     checkNestedIsMissing(reqs, data) {
+        if (!this.checkIsNested(reqs)) {
+            return false;
+        }
         const isRequired = reqs.required;
         const isUndefined = data === undefined;
         const isEmpty = _validations.isObject(data) && Object.keys(data).length === 0;

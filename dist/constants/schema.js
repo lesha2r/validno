@@ -6,5 +6,6 @@ export var SchemaFields;
     SchemaFields["Rules"] = "rules";
     SchemaFields["Title"] = "title";
     SchemaFields["CustomMessage"] = "customMessage";
+    SchemaFields["RequiredMessage"] = "requiredMessage";
     SchemaFields["JoinErrors"] = "joinErrors";
 })(SchemaFields || (SchemaFields = {}));

@@ -5,6 +5,7 @@ export declare enum SchemaFields {
     Rules = "rules",
     Title = "title",
     CustomMessage = "customMessage",
+    RequiredMessage = "requiredMessage",
     JoinErrors = "joinErrors"
 }
 //# sourceMappingURL=schema.d.ts.map

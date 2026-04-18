@@ -5,5 +5,6 @@ export enum SchemaFields {
     Rules = 'rules',
     Title = 'title',
     CustomMessage = 'customMessage',
+    RequiredMessage = 'requiredMessage',
     JoinErrors = 'joinErrors'
 }

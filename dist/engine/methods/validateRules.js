@@ -1,5 +1,11 @@
 import _validations from "../../utils/validations.js";
 import { ValidationDetails } from "../../constants/details.js";
+function extractRuleValueAndMessage(rule) {
+    if (rule !== null && typeof rule === 'object' && 'value' in rule) {
+        return { value: rule.value, message: rule.message };
+    }
+    return { value: rule };
+}
 export const rulesParams = {
     lengthMin: {
         allowedTypes: [String]
@@ -148,7 +154,8 @@ function checkRules(key, value, requirements, inputObj) {
             continue;
         }
         const func = rulesFunctions[ruleName];
-        const args = rules[ruleName];
+        const rawArgs = rules[ruleName];
+        const { value: args, message: inlineMessage } = extractRuleValueAndMessage(rawArgs);
         let result = func(key, value, args, { schema: this.schema, input: inputObj });
         if (requirements.customMessage && typeof requirements.customMessage === 'function') {
             result.details = requirements.customMessage({
@@ -160,6 +167,9 @@ function checkRules(key, value, requirements, inputObj) {
                 schema: this.schema,
                 rules: rules,
             });
+        }
+        else if (inlineMessage && !result.result) {
+            result.details = inlineMessage;
         }
         allResults.push(result);
         i++;

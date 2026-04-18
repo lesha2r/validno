@@ -3,7 +3,7 @@ import _validations from "../../utils/validations.js";
 import ValidnoResult from "../ValidnoResult.js";
 import { ValidationDetails } from "../../constants/details.js";
 
-import { FieldSchema, SchemaDefinition } from "../../types/common.js";
+import { FieldSchema, SchemaDefinition, RuleWithMessage } from "../../types/common.js";
 
 export interface ValidateRulesInput {
     results: ValidnoResult,
@@ -14,9 +14,20 @@ export interface ValidateRulesInput {
     rulesChecked: boolean[]
 }
 
-export type Rule = Record<string, any>
+export type Rule = Record<string, RuleWithMessage>
 
 type TLengths = string | Array<any>
+
+/**
+ * Helper to extract rule value and optional inline message from rule definition.
+ * Supports both simple values and objects with { value, message } format.
+ */
+function extractRuleValueAndMessage<T>(rule: RuleWithMessage<T>): { value: T; message?: string } {
+    if (rule !== null && typeof rule === 'object' && 'value' in rule) {
+        return { value: (rule as { value: T; message?: string }).value, message: (rule as { value: T; message?: string }).message };
+    }
+    return { value: rule as T };
+}
 
 export const rulesParams = {
     lengthMin: {
@@ -201,10 +212,14 @@ function checkRules (this: any, key: string, value: any, requirements: FieldSche
         }
 
         const func = rulesFunctions[ruleName];
-        const args = rules[ruleName];
+        const rawArgs = rules[ruleName];
+        
+        // Extract value and optional inline message from rule definition
+        const { value: args, message: inlineMessage } = extractRuleValueAndMessage(rawArgs);
 
         let result = func(key, value, args, { schema: this.schema, input: inputObj });
         
+        // Priority: customMessage callback > inline message > default details
         if (requirements.customMessage && typeof requirements.customMessage === 'function') {
             result.details = requirements.customMessage({
                 keyword: ruleName,
@@ -215,6 +230,9 @@ function checkRules (this: any, key: string, value: any, requirements: FieldSche
                 schema: this.schema,
                 rules: rules,
             })
+        } else if (inlineMessage && !result.result) {
+            // Use inline message only if validation failed
+            result.details = inlineMessage;
         }
 
         allResults.push(result)

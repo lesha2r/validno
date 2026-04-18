@@ -1,5 +1,5 @@
 import ValidnoResult from "../ValidnoResult.js";
-import { SchemaDefinition } from "../../types/common.js";
+import { SchemaDefinition, RuleWithMessage } from "../../types/common.js";
 export interface ValidateRulesInput {
     results: ValidnoResult;
     nestedKey: string;
@@ -8,7 +8,7 @@ export interface ValidateRulesInput {
     data: any;
     rulesChecked: boolean[];
 }
-export declare type Rule = Record<string, any>;
+export declare type Rule = Record<string, RuleWithMessage>;
 export declare const rulesParams: {
     lengthMin: {
         allowedTypes: StringConstructor[];

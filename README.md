@@ -78,9 +78,10 @@ const schema = new Schema({
   fieldName: {
     type: String,           // Required: field type
     required: true,         // Optional: whether field is required (default: true)
-    rules: {},             // Optional: validation rules
-    title: "Field Name",   // Optional: human-readable field name (only used in custom messages for now)
-    customMessage: (details) => "Custom error" // Optional: custom error function
+    rules: {},              // Optional: validation rules (supports inline messages)
+    title: "Field Name",    // Optional: human-readable field name
+    requiredMessage: "...", // Optional: custom message for missing required field
+    customMessage: (details) => "Custom error" // Optional: custom error callback
   }
 });
 ```
@@ -273,7 +274,77 @@ const result = schema.validate(data);
 
 ## Custom Error Messages
 
-### Field-Level Custom Messages
+### Inline Rule Messages (Zod-like syntax)
+
+Attach error messages directly to rules for cleaner, more ergonomic validation:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    rules: {
+      isEmail: { value: true, message: 'Please enter a valid email address' },
+      lengthMinMax: { value: [5, 100], message: 'Email must be between 5 and 100 characters' }
+    }
+  },
+  password: {
+    type: String,
+    required: true,
+    rules: {
+      lengthMinMax: { value: [8, 100], message: 'Password must be at least 8 characters' }
+    }
+  },
+  age: {
+    type: Number,
+    required: false,
+    rules: {
+      min: { value: 18, message: 'You must be at least 18 years old' }
+    }
+  }
+});
+```
+
+You can also mix inline messages with simple rule syntax:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    rules: {
+      isEmail: { value: true, message: 'Invalid email format' },
+      lengthMin: 5  // Uses default error message
+    }
+  }
+});
+```
+
+### Required Message Shorthand
+
+For the common case of required field validation, use the `requiredMessage` shorthand:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    requiredMessage: 'Please enter your email address'
+  },
+  name: {
+    type: String,
+    required: true,
+    requiredMessage: 'Name is required'
+  }
+});
+
+const result = schema.validate({});
+// result.errors = ['Please enter your email address', 'Name is required']
+```
+
+### Field-Level Custom Messages (Advanced)
+
+For complex cases where the message depends on the actual value, use the `customMessage` callback:
 
 ```javascript
 const schema = new Schema({
@@ -284,8 +355,11 @@ const schema = new Schema({
       isEmail: true
     },
     customMessage: ({ keyword, value, key }) => {
+      if (keyword === 'missing') {
+        return `${key} is required`;
+      }
       if (keyword === 'isEmail') {
-        return `Please enter a valid email address for ${key}`;
+        return `"${value}" is not a valid email address`;
       }
       return `Invalid value for ${key}`;
     }
@@ -293,10 +367,17 @@ const schema = new Schema({
 });
 ```
 
+### Message Priority
+
+When multiple message options are specified, the priority is:
+1. `customMessage` callback (highest priority)
+2. Inline rule messages (for rules) / `requiredMessage` (for missing fields)
+3. Default error messages (lowest priority)
+
 ### Custom Message Parameters
 
 The `customMessage` function receives an object with:
-- `keyword`: The validation rule that failed
+- `keyword`: The validation rule that failed (`'missing'`, `'type'`, or rule name like `'isEmail'`)
 - `value`: The actual value being validated
 - `key`: The field name
 - `title`: The field title (if specified)

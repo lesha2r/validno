@@ -35,6 +35,11 @@ class HelperUtility implements HelperUtils {
    * @returns True if required nested data is missing
    */
   checkNestedIsMissing(reqs: SchemaDefinition, data: any): boolean {
+    // Only consider this for nested schemas, not flat field definitions
+    if (!this.checkIsNested(reqs)) {
+      return false;
+    }
+    
     const isRequired = reqs.required;
     const isUndefined = data === undefined;
     const isEmpty = _validations.isObject(data) && Object.keys(data).length === 0;

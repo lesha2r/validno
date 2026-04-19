@@ -2,6 +2,19 @@
   "name": "validno",
   "version": "0.4.7-beta.1",
   "description": "A lightweight TypeScript validation library for runtime data validation. Used as part of Kodzero API framework.",
+  "keywords": [
+    "validation",
+    "schema",
+    "typescript",
+    "validator",
+    "runtime-validation",
+    "form-validation",
+    "data-validation",
+    "object-validation",
+    "lightweight",
+    "zod-alternative",
+    "yup-alternative"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -53,5 +66,9 @@
   "bugs": {
     "url": "https://github.com/lesha2r/validno/issues"
   },
-  "homepage": "https://github.com/lesha2r/validno#readme"
+  "homepage": "https://validno.kodzero.pro",
+  "funding": {
+    "type": "individual",
+    "url": "https://kodzero.pro"
+  }
 }

@@ -9,8 +9,9 @@ const schema = new Schema({
   fieldName: {
     type: String,           // Required: field type
     required: true,         // Optional: whether field is required (default: true)
-    rules: {},             // Optional: validation rules
+    rules: {},             // Optional: validation rules (supports { value, message })
     title: "Field Name",   // Optional: human-readable field name
+    requiredMessage: "...", // Optional: custom message for missing required field
     customMessage: (details) => "Custom error" // Optional: custom error function
   }
 });
@@ -30,10 +31,18 @@ Specifies the expected data type for the field. Can be:
 Boolean value indicating whether the field is mandatory. Defaults to `true`.
 
 ### `rules` (Optional)
-Object containing validation rules specific to the field type. See the validation rules sections for details.
+Object containing validation rules specific to the field type. Each rule supports both syntaxes:
+
+- Simple form (uses default message): `isEmail: true`
+- Inline message form: `isEmail: { value: true, message: 'Invalid email' }`
+
+Both syntaxes can be mixed in the same `rules` object.
 
 ### `title` (Optional)
 Human-readable name for the field, used in error messages.
+
+### `requiredMessage` (Optional)
+Custom message used when a required field is missing.
 
 ### `customMessage` (Optional)
 Function to generate custom error messages. Receives validation details and should return a string.

@@ -1,10 +1,59 @@
 # Custom Error Messages
 
-Custom error messages help you provide user-friendly, contextual feedback when validation fails. Validno allows you to define custom messages at the field level.
+Custom error messages help you provide user-friendly, contextual feedback when validation fails. Validno supports three complementary approaches:
+
+- Inline rule messages (new ergonomic syntax)
+- `requiredMessage` shorthand for missing required fields
+- `customMessage` callback for advanced dynamic cases
+
+## Inline Rule Messages
+
+Attach a message directly to a rule with `{ value, message }`:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    rules: {
+      isEmail: { value: true, message: 'Please enter a valid email address' },
+      lengthMinMax: { value: [5, 100], message: 'Email must be between 5 and 100 characters' }
+    }
+  }
+});
+```
+
+You can mix new inline messages with the old shorthand rule syntax in the same `rules` object:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    rules: {
+      isEmail: { value: true, message: 'Invalid email format' },
+      lengthMin: 5 // Simple form — uses default message
+    }
+  }
+});
+```
+
+## Required Message Shorthand
+
+For missing required fields, use `requiredMessage`:
+
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    requiredMessage: 'Please enter your email address'
+  }
+});
+```
 
 ## Basic Custom Messages
 
-Use the `customMessage` function to override default error messages:
+Use `customMessage` for advanced scenarios where the text depends on runtime values:
 
 ```javascript
 const schema = new Schema({
@@ -18,7 +67,7 @@ const schema = new Schema({
       if (keyword === 'isEmail') {
         return 'Please enter a valid email address';
       }
-      if (keyword === 'required') {
+      if (keyword === 'missing') {
         return 'Email address is required';
       }
       return `Invalid value for ${key}`;
@@ -54,7 +103,7 @@ const schema = new Schema({
           return `${title} must be at least ${rules.lengthMin} characters long`;
         case 'lengthMax':
           return `${title} cannot exceed ${rules.lengthMax} characters`;
-        case 'required':
+        case 'missing':
           return `${title} is required`;
         default:
           return `Invalid ${title.toLowerCase()}`;
@@ -98,7 +147,7 @@ const passwordSchema = new Schema({
           return `${title} cannot exceed ${rules.lengthMax} characters`;
         case 'regex':
           return `${title} must contain at least one uppercase letter, one lowercase letter, and one number`;
-        case 'required':
+        case 'missing':
           return `${title} is required`;
         default:
           return `Invalid ${title.toLowerCase()}`;
@@ -232,7 +281,7 @@ const localizedSchema = new Schema({
     },
     customMessage: ({ keyword, rules }) => {
       switch (keyword) {
-        case 'required':
+        case 'missing':
           return getLocalizedMessage('required');
         case 'isEmail':
           return getLocalizedMessage('emailInvalid');
@@ -263,7 +312,7 @@ const userSchema = new Schema({
       },
       customMessage: ({ keyword, title, rules }) => {
         switch (keyword) {
-          case 'required':
+          case 'missing':
             return `${title} is required for your profile`;
           case 'lengthMin':
             return `${title} must be at least ${rules.lengthMin} characters long`;
@@ -280,7 +329,7 @@ const userSchema = new Schema({
       },
       customMessage: ({ keyword, title }) => {
         switch (keyword) {
-          case 'required':
+          case 'missing':
             return `${title} is required to create your account`;
           case 'isEmail':
             return `Please enter a valid ${title.toLowerCase()}`;
@@ -398,7 +447,7 @@ const registrationSchema = new Schema({
     },
     customMessage: ({ keyword, rules, title }) => {
       switch (keyword) {
-        case 'required':
+        case 'missing':
           return `${title} is required`;
         case 'lengthMin':
           return `${title} must be at least ${rules.lengthMin} characters`;
@@ -418,7 +467,7 @@ const registrationSchema = new Schema({
     },
     customMessage: ({ keyword, title }) => {
       switch (keyword) {
-        case 'required':
+        case 'missing':
           return `${title} is required to create your account`;
         case 'isEmail':
           return 'Please enter a valid email address (e.g., user@example.com)';
@@ -437,7 +486,7 @@ const registrationSchema = new Schema({
     },
     customMessage: ({ keyword, rules, title }) => {
       switch (keyword) {
-        case 'required':
+        case 'missing':
           return `${title} is required`;
         case 'lengthMin':
           return `${title} must be at least ${rules.lengthMin} characters long`;
@@ -450,6 +499,14 @@ const registrationSchema = new Schema({
   }
 });
 ```
+
+## Message Priority
+
+When multiple message options are set, Validno uses this priority:
+
+1. `customMessage` callback
+2. Inline rule `message` / `requiredMessage`
+3. Default built-in messages
 
 ## Next Steps
 

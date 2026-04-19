@@ -55,6 +55,7 @@ const result = schema.validate(data, ['name', 'email']);
 interface FieldSchema {
   type: TypeDefinition;
   required?: boolean;
+  requiredMessage?: string;
   rules?: ValidationRules;
   title?: string;
   customMessage?: (context: MessageContext) => string;
@@ -83,27 +84,38 @@ type TypeDefinition =
 
 ```typescript
 interface ValidationRules {
+  // Rule value with inline message
+  // Example: isEmail: { value: true, message: 'Invalid email' }
+  // Simple form (uses default message): isEmail: true
+
   // String rules
-  length?: number;
-  lengthMin?: number;
-  lengthMax?: number;
-  lengthMinMax?: [number, number];
-  lengthNot?: number;
-  isEmail?: boolean;
-  regex?: RegExp;
-  is?: any;
-  isNot?: any;
+  length?: number | RuleConfig<number>;
+  lengthMin?: number | RuleConfig<number>;
+  lengthMax?: number | RuleConfig<number>;
+  lengthMinMax?: [number, number] | RuleConfig<[number, number]>;
+  lengthNot?: number | RuleConfig<number>;
+  isEmail?: boolean | RuleConfig<boolean>;
+  regex?: RegExp | RuleConfig<RegExp>;
+  is?: any | RuleConfig<any>;
+  isNot?: any | RuleConfig<any>;
   
   // Number rules  
-  min?: number;
-  max?: number;
-  minMax?: [number, number];
+  min?: number | RuleConfig<number>;
+  max?: number | RuleConfig<number>;
+  minMax?: [number, number] | RuleConfig<[number, number]>;
   
   // Array rules
-  enum?: any[];
+  enum?: any[] | RuleConfig<any[]>;
   
   // Custom rules
-  custom?: (value: any, context: ValidationContext) => boolean | ValidationResult;
+  custom?:
+    | ((value: any, context: ValidationContext) => boolean | ValidationResult)
+    | RuleConfig<(value: any, context: ValidationContext) => boolean | ValidationResult>;
+}
+
+interface RuleConfig<T> {
+  value: T;
+  message?: string;
 }
 ```
 
@@ -257,7 +269,7 @@ SchemaFields.EACH_TYPE   // 'eachType'
 
 Common validation error keywords used in custom messages:
 
-- `'required'` - Field is required but missing
+- `'missing'` - Field is required but missing
 - `'type'` - Value is wrong type
 - `'length'` - String/array length doesn't match exact requirement
 - `'lengthMin'` - String/array is too short

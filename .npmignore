@@ -4,5 +4,6 @@ jest.config.ts
 .eslintrc.*
 todos.md
 docs
+docs/**
 coverage
 dev.*s

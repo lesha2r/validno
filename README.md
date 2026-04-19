@@ -1,6 +1,19 @@
 # Validno
 
+[![npm version](https://img.shields.io/npm/v/validno.svg)](https://www.npmjs.com/package/validno)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/validno)](https://bundlephobia.com/package/validno)
+[![license](https://img.shields.io/npm/l/validno.svg)](https://github.com/lesha2r/validno/blob/main/LICENSE)
+
 A lightweight and flexible TypeScript validation library for Node.js applications.
+
+## Why Validno?
+
+- 🪶 **Tiny footprint** — Just 4.2 KB gzipped
+- 🎯 **Simple API** — Declarative schema definition, no method chaining
+- 💬 **Flexible messages** — Inline, shorthand, or callback-based error messages
+- 📦 **Zero dependencies** — No bloat in your node_modules
+
+> 🚀 **Used in production** — Validno is the default validation library powering [Kodzero](https://kodzero.pro), an app constructor platform.
 
 ## Documentation
 
@@ -65,7 +78,9 @@ if (result.ok) {
 - **Type Validation**: Support for built-in types (String, Number, Boolean, Array, Object, Date, RegExp) and custom types
 - **Flexible Rules**: Comprehensive set of validation rules for strings, numbers, arrays, and custom logic
 - **Nested Objects**: Full support for nested object validation
-- **Custom Messages**: Define custom error messages for validation failures
+- **Inline Error Messages**: Zod-like syntax for attaching messages directly to rules
+- **Required Message Shorthand**: Simple `requiredMessage` field for missing field errors
+- **Custom Message Callbacks**: Advanced callback function for dynamic error messages
 - **Partial Validation**: Validate only specific keys when needed
 - **TypeScript Support**: Written in TypeScript with full type definitions
 
@@ -274,7 +289,7 @@ const result = schema.validate(data);
 
 ## Custom Error Messages
 
-### Inline Rule Messages (Zod-like syntax)
+### Inline Rule Messages
 
 Attach error messages directly to rules for cleaner, more ergonomic validation:
 
@@ -367,15 +382,6 @@ const schema = new Schema({
 });
 ```
 
-### Message Priority
-
-When multiple message options are specified, the priority is:
-1. `customMessage` callback (highest priority)
-2. Inline rule messages (for rules) / `requiredMessage` (for missing fields)
-3. Default error messages (lowest priority)
-
-### Custom Message Parameters
-
 The `customMessage` function receives an object with:
 - `keyword`: The validation rule that failed (`'missing'`, `'type'`, or rule name like `'isEmail'`)
 - `value`: The actual value being validated
@@ -384,6 +390,13 @@ The `customMessage` function receives an object with:
 - `reqs`: The field requirements object
 - `schema`: The full schema object
 - `rules`: The rules object for this field
+
+### Message Priority
+
+When multiple message options are specified, the priority is:
+1. `customMessage` callback (highest priority)
+2. Inline rule messages (for rules) / `requiredMessage` (for missing fields)
+3. Default error messages (lowest priority)
 
 ## Partial Validation
 
@@ -601,3 +614,56 @@ const result = userSchema.validate<User>(newUser, ['name', 'email'])
 // ...or use automatic type inference based on the object
 const result = userSchema.validate(newUser, ['name', 'email'])
 ```
+
+## Comparison with Other Libraries
+
+| Feature | Validno | Zod | Yup | Joi |
+|---------|---------|-----|-----|-----|
+| Inline rule messages | ✅ | ✅ | ❌ | ❌ |
+| Nested object validation | ✅ | ✅ | ✅ | ✅ |
+| Custom validators | ✅ | ✅ | ✅ | ✅ |
+| TypeScript support | ✅ | ✅ | ✅ | ⚠️ |
+| Zero dependencies | ✅ | ✅ | ❌ | ❌ |
+| Bundle size (minified) | 13.6 KB | 261.6 KB | 42.7 KB | 171.9 KB |
+| Bundle size (gzipped) | 4.2 KB | 57.1 KB | 13.1 KB | 52.8 KB |
+
+## Migration Guide
+
+### From callback-based messages to inline messages
+
+**Before (callback approach):**
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    rules: { isEmail: true },
+    customMessage: ({ keyword }) => {
+      if (keyword === 'isEmail') return 'Invalid email';
+      return 'Error';
+    }
+  }
+});
+```
+
+**After (inline approach):**
+```javascript
+const schema = new Schema({
+  email: {
+    type: String,
+    required: true,
+    requiredMessage: 'Email is required',
+    rules: {
+      isEmail: { value: true, message: 'Invalid email' }
+    }
+  }
+});
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT © [lesha2r](https://github.com/lesha2r)

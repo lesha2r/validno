@@ -27,10 +27,12 @@ export interface KeyValidationDetails {
 class ValidateEngine {
   definition: SchemaDefinition;
   result: ValidnoResult;
+  private _schemaEntries: [string, any][];  // Cache schema entries
 
 constructor(definition: SchemaDefinition) {
     this.definition = definition
     this.result = new ValidnoResult();
+    this._schemaEntries = Object.entries(this.definition);  // Cache once
   }
 
   validate(data: any, validationKeys?: string | string[]): ValidnoResult {

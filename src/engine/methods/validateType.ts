@@ -76,64 +76,122 @@ const handleTypeValidation = (
     return [_validateType.getResult(keyName, true)] 
   }
   
-  const customErrDetails = hasCustomMessage ?
-    //@ts-ignore
-    reqs.customMessage({
-      keyword: ValidationIds.Type,
-      value: value,
-      key: keyName,
-      title: keyTitle as string,
-      reqs: reqs,
-      schema: {} as SchemaDefinition
-    }) :
-    null;
-
-  const baseErrDetails = _errors.getErrorDetails(keyName, reqs.type, value)
-
-  const getDetails = (isOK: boolean, errorText?: string) => isOK ?
-    ValidationDetails.OK :
-    errorText || customErrDetails || baseErrDetails
-
+  // Optimized: only generate error messages when needed (on failure)
   const typeBySchema = reqs.type
   const result: TypeValidationResult[] = []
 
   switch (typeBySchema) {
     case 'any': {
-      result.push(_validateType.getResult(keyName, true, getDetails(true)))
+      result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       break
     }
     case Number: {
-      const isNumber = isNotNull && value!.constructor === Number
-      result.push(_validateType.getResult(keyName, isNumber, getDetails(isNumber)))
+      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
+      const isNumber = typeof value === 'number' || (isNotNull && value!.constructor === Number)
+      if (isNumber) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case String: {
-      const isString = isNotNull && value!.constructor === String
-      result.push(_validateType.getResult(keyName, isString, getDetails(isString)))
+      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
+      const isString = typeof value === 'string' || (isNotNull && value!.constructor === String)
+      if (isString) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case Date: {
       const isDate = isNotNull && value!.constructor === Date
       const isValid = isDate && !isNaN((value as Date).getTime())
-      const isValidDate = isDate && isValid
-      result.push(_validateType.getResult(keyName, isValidDate, getDetails(isValidDate, ValidationDetails.InvalidDate)))
+      if (isValid) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          ValidationDetails.InvalidDate
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case Boolean: {
-      const isBoolean = isNotNull && value!.constructor === Boolean
-      result.push(_validateType.getResult(keyName, isBoolean, getDetails(isBoolean)))
+      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
+      const isBoolean = typeof value === 'boolean' || (isNotNull && value!.constructor === Boolean)
+      if (isBoolean) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case Array: {
-      const isArray = isNotNull && value!.constructor === Array
+      const isArray = Array.isArray(value)
       if (!isArray) {
-        result.push(_validateType.getResult(keyName, false, getDetails(isArray)))
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
         break
       }
       let isEachChecked = { passed: true, details: "" }
       if ('eachType' in reqs) {
-        for (const el of value as any[]) {
-          const result = handleTypeValidation(`each of ${key}`, el, { type: reqs.eachType, required: true })
+        // Optimized: use for loop instead of for...of
+        const arr = value as any[];
+        for (let i = 0; i < arr.length; i++) {
+          const result = handleTypeValidation(`each of ${key}`, arr[i], { type: reqs.eachType, required: true })
 
           if (!result[0].passed) {
             isEachChecked.passed = false
@@ -142,29 +200,87 @@ const handleTypeValidation = (
           }
         }
       }
-      const isOk = isArray && isEachChecked.passed
-      const details = !isEachChecked.passed ? isEachChecked.details : getDetails(isOk)
-      result.push(_validateType.getResult(keyName, isOk, details))
+      if (isEachChecked.passed) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        result.push(_validateType.getResult(keyName, false, isEachChecked.details))
+      }
       break
     }
     case Object: {
       const isObject = _validations.isObject(value) && value!.constructor === Object
-      result.push(_validateType.getResult(keyName, isObject, getDetails(isObject)))
+      if (isObject) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case RegExp: {
       const isRegex = _validations.isRegex(value)
-      result.push(_validateType.getResult(keyName, isRegex, getDetails(isRegex)))
+      if (isRegex) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     case null: {
       const isNull = value === null
-      result.push(_validateType.getResult(keyName, isNull, getDetails(isNull)))
+      if (isNull) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
       break
     }
     default: {
       if (value === null && typeBySchema !== null) {
-        result.push(_validateType.getResult(keyName, false, getDetails(false)))
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
         break
       }
 
@@ -173,7 +289,22 @@ const handleTypeValidation = (
       const isBothObjectId = isObjectId(value, typeBySchema)
 
       const isOK = (isInstanceOf && isConstructorSame) || (isBothObjectId);
-      result.push(_validateType.getResult(keyName, isOK, getDetails(isOK)))
+      if (isOK) {
+        result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
+      } else {
+        const details = hasCustomMessage ?
+          //@ts-ignore
+          reqs.customMessage({
+            keyword: ValidationIds.Type,
+            value: value,
+            key: keyName,
+            title: keyTitle as string,
+            reqs: reqs,
+            schema: {} as SchemaDefinition
+          }) :
+          _errors.getErrorDetails(keyName, reqs.type, value)
+        result.push(_validateType.getResult(keyName, false, details))
+      }
     }
   }
 
@@ -193,12 +324,20 @@ function validateType(input: ValidateValueInput) {
     const { results, key, value, reqs, nestedKey, typeChecked } = input;
     const typeCheck = handleTypeValidation(key, value, reqs, nestedKey);
 
-    typeCheck.forEach((res) => {
-      if (!res.passed) {
+    // Optimized: use for loop instead of forEach
+    for (let i = 0; i < typeCheck.length; i++) {
+      if (!typeCheck[i].passed) {
         typeChecked.push(false);
-        results.errors.push(res.details || '');
+        const errMsg = typeCheck[i].details || '';
+        results.errors.push(errMsg);
+        
+        // Also add to errorsByKeys for this specific key
+        if (!(nestedKey in results.errorsByKeys)) {
+          results.errorsByKeys[nestedKey] = [];
+        }
+        results.errorsByKeys[nestedKey].push(errMsg);
       }
-    });
+    }
 }
 
 export default validateType;

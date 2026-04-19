@@ -3,10 +3,10 @@ import ValidateEngine, { KeyValidationDetails } from "../ValidateEngine.js";
 function handleNestedKey(this: ValidateEngine, input: KeyValidationDetails) {
     const { results, key, nestedKey, data, reqs } = input;
   
-    const nestedKeys = Object.keys(reqs);
+    // Optimized: use for...in instead of Object.keys()
     const nestedResults: boolean[] = [];
 
-    for (const itemKey of nestedKeys) {
+    for (const itemKey in reqs) {
       const deepParams: KeyValidationDetails = {
         key: itemKey,
         data: data ? data[key] : undefined,

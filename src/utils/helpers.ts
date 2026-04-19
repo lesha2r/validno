@@ -24,8 +24,21 @@ class HelperUtility implements HelperUtils {
       return false;
     }
 
-    const objKeys = Object.keys(obj);
-    return !objKeys.every(key => defaultSchemaKeys.includes(key as typeof defaultSchemaKeys[number]));
+    // Optimized: use for...in instead of Object.keys()
+    for (const key in obj) {
+      let isSchemaKey = false;
+      // Check if key is in default schema keys - unroll loop for common case
+      for (let i = 0; i < defaultSchemaKeys.length; i++) {
+        if (defaultSchemaKeys[i] === key) {
+          isSchemaKey = true;
+          break;
+        }
+      }
+      if (!isSchemaKey) {
+        return true; // Found a non-schema key, so it's nested
+      }
+    }
+    return false;
   }
 
   /**

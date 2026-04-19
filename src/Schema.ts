@@ -7,6 +7,7 @@ export const defaultSchemaKeys = Object.values(SchemaFields);
 
 export class Schema {
     definition: SchemaDefinition
+    private _engine: ValidateEngine  // Cache engine instance
 
     constructor(inputSchemaDefinition: SchemaDefinition) {
         if (!inputSchemaDefinition || typeof inputSchemaDefinition !== 'object') {
@@ -14,11 +15,13 @@ export class Schema {
         }
         
         this.definition = inputSchemaDefinition;
+        this._engine = new ValidateEngine(this.definition);  // Create once
     }
 
     validate<T, K extends keyof T = keyof T>(inputData: T, validationKeys?: K | K[]): ValidnoResult {
-        const engine = new ValidateEngine(this.definition);
-        const result = engine.validate(inputData, validationKeys as string | string[]);
+        // Reuse engine instance, just reset result
+        this._engine.result = new ValidnoResult();
+        const result = this._engine.validate(inputData, validationKeys as string | string[]);
         return result;
     }
 }

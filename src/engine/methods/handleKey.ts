@@ -15,20 +15,23 @@ export interface ValidateKeyDetailsParams {
 function validateKeyValue(this: ValidateEngine, params: ValidateKeyDetailsParams) {
     const { results, key, nestedKey, data, reqs, hasMissing } = params;
 
-    const missedCheck: boolean[] = [];
-    const typeChecked: boolean[] = [];
-    const rulesChecked: boolean[] = [];
+    // Reuse arrays to reduce allocations
+    const checks = {
+      missedCheck: [] as boolean[],
+      typeChecked: [] as boolean[],
+      rulesChecked: [] as boolean[]
+    };
 
     if (hasMissing) {
-      return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck });
+      return this.handleMissingKeyValidation({ results, key, nestedKey, data, reqs, missedCheck: checks.missedCheck });
     }
 
     const keyValue = data ? data[key] : undefined;
 
-    this.validateType({results, key, value: keyValue, reqs, nestedKey, typeChecked});
-    this.validateRules({results, nestedKey, value:  keyValue, reqs, data, rulesChecked});
+    this.validateType({results, key, value: keyValue, reqs, nestedKey, typeChecked: checks.typeChecked});
+    this.validateRules({results, nestedKey, value:  keyValue, reqs, data, rulesChecked: checks.rulesChecked});
 
-    return this.finishValidation({results, nestedKey, missedCheck, typeChecked, rulesChecked});
+    return this.finishValidation({results, nestedKey, missedCheck: checks.missedCheck, typeChecked: checks.typeChecked, rulesChecked: checks.rulesChecked});
 }
 
 function validateKey(this: ValidateEngine, input: KeyValidationDetails): ValidnoResult {

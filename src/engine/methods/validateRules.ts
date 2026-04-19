@@ -23,10 +23,11 @@ type TLengths = string | Array<any>
  * Supports both simple values and objects with { value, message } format.
  */
 function extractRuleValueAndMessage<T>(rule: RuleWithMessage<T>): { value: T; message?: string } {
-    if (rule !== null && typeof rule === 'object' && 'value' in rule) {
-        return { value: (rule as { value: T; message?: string }).value, message: (rule as { value: T; message?: string }).message };
+    // Optimized: check for common case first (primitive value)
+    if (rule === null || typeof rule !== 'object' || !('value' in rule)) {
+        return { value: rule as T };
     }
-    return { value: rule as T };
+    return { value: (rule as { value: T; message?: string }).value, message: (rule as { value: T; message?: string }).message };
 }
 
 export const rulesParams = {
@@ -199,15 +200,11 @@ function checkRules (this: any, key: string, value: any, requirements: FieldSche
     const title = requirements.title || key
 
     const allResults = []
-    const allRulesKeys = Object.keys(rules)
     
-    let i = 0;
-    while (i < allRulesKeys.length) {
-        const ruleName = allRulesKeys[i]
-
+    // Use for...in loop instead of Object.keys() for better performance
+    for (const ruleName in rules) {
         // Если правило, указанное для ключа, отсутствует в списке доступных
-        if (ruleName in rulesFunctions === false) {
-            i++
+        if (!(ruleName in rulesFunctions)) {
             continue
         }
 
@@ -236,16 +233,21 @@ function checkRules (this: any, key: string, value: any, requirements: FieldSche
         }
 
         allResults.push(result)
-
-        i++;
     }
   
-    // If key has failed rules checks
-    const failedResults = allResults.filter(el => el.result === false)
+    // If key has failed rules checks - optimize by avoiding filter
+    let hasFailures = false;
+    const failedDetails = [];
+    for (let i = 0; i < allResults.length; i++) {
+        if (allResults[i].result === false) {
+            hasFailures = true;
+            failedDetails.push(allResults[i].details);
+        }
+    }
     
-    if (failedResults.length) {
+    if (hasFailures) {
         result.ok = false
-        result.details = failedResults.map(el => el.details)
+        result.details = failedDetails
     }
 
     return result;
@@ -259,12 +261,18 @@ function validateRules(input: ValidateRulesInput) {
     if (!ruleCheck.ok) {
       rulesChecked.push(false);
 
-      ruleCheck.details.forEach((el: any) => {
-        if (!(nestedKey in results.errorsByKeys)) results.errorsByKeys[nestedKey] = [];
-        
-        results.errors.push(el);
-        results.errorsByKeys[nestedKey] = ['1'];
-      });
+      // Optimized: avoid forEach, use for loop
+      const details = ruleCheck.details;
+      
+      // Ensure errorsByKeys entry exists
+      if (!(nestedKey in results.errorsByKeys)) {
+        results.errorsByKeys[nestedKey] = [];
+      }
+      
+      for (let i = 0; i < details.length; i++) {
+        results.errors.push(details[i]);
+        results.errorsByKeys[nestedKey].push(details[i]);
+      }
     }
 }
 

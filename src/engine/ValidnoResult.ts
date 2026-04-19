@@ -50,27 +50,35 @@ class ValidnoResult {
     const error = errMsg || _errors.getMissingError(key);
 
     this.missed.push(key);
-    this.setFailed(key, error);
-    this.setKeyStatus(key, false);
+    this.failed.push(key);
+    this.byKeys[key] = false;
+    this.errors.push(error);
+    
+    if (!(key in this.errorsByKeys)) {
+      this.errorsByKeys[key] = [];
+    }
+    this.errorsByKeys[key].push(error);
   }
 
   setPassed(key: string): void {
     this.passed.push(key);
-    this.setKeyStatus(key, true);
+    this.byKeys[key] = true;
   }
 
   setFailed(key: string, msg?: string): void {
-    if (!(key in this.errorsByKeys)) {
-        this.errorsByKeys[key] = [];
-    }
-
     this.failed.push(key);
-    this.setKeyStatus(key, false);
-
-    if (!msg) return;
-
-    this.errors.push(msg);
-    this.errorsByKeys[key].push(msg);
+    this.byKeys[key] = false;
+    
+    // Always ensure errorsByKeys entry exists
+    if (!(key in this.errorsByKeys)) {
+      this.errorsByKeys[key] = [];
+    }
+    
+    // Push message if provided
+    if (msg) {
+      this.errors.push(msg);
+      this.errorsByKeys[key].push(msg);
+    }
   }
 
   joinErrors(separator = '; '): string {
@@ -78,42 +86,64 @@ class ValidnoResult {
   }
 
   merge(resultsNew: ResultInput): ValidnoResult {
-    this.failed = [...this.failed, ...resultsNew.failed];
-    this.errors = [...this.errors, ...resultsNew.errors];
-    this.missed = [...this.missed, ...resultsNew.missed];
-    this.passed = [...this.passed, ...resultsNew.passed];
-    this.byKeys = { ...this.byKeys, ...resultsNew.byKeys };
+    // Optimized: cache lengths and only merge arrays that have content
+    const newFailedLen = resultsNew.failed.length;
+    const newErrorsLen = resultsNew.errors.length;
+    const newMissedLen = resultsNew.missed.length;
+    const newPassedLen = resultsNew.passed.length;
+    
+    if (newFailedLen) {
+      Array.prototype.push.apply(this.failed, resultsNew.failed);
+    }
+    if (newErrorsLen) {
+      Array.prototype.push.apply(this.errors, resultsNew.errors);
+    }
+    if (newMissedLen) {
+      Array.prototype.push.apply(this.missed, resultsNew.missed);
+    }
+    if (newPassedLen) {
+      Array.prototype.push.apply(this.passed, resultsNew.passed);
+    }
+
+    // Direct assignment is faster than spread - only iterate if needed
+    for (const key in resultsNew.byKeys) {
+      this.byKeys[key] = resultsNew.byKeys[key];
+    }
 
     for (const key in resultsNew.errorsByKeys) {
         if (!(key in this.errorsByKeys)) {
             this.errorsByKeys[key] = [];
         }
-
-        this.errorsByKeys[key] = [
-            ...this.errorsByKeys[key],
-            ...resultsNew.errorsByKeys[key]
-        ];
+        Array.prototype.push.apply(this.errorsByKeys[key], resultsNew.errorsByKeys[key]);
     }
 
     return this;
   }
 
   clearEmptyErrorsByKeys(): void {
+    // Optimized: use for...in instead of Object.keys()
     for (const key in this.errorsByKeys) {
-        if (!this.errorsByKeys[key].length) {
+        if (this.errorsByKeys[key].length === 0) {
             delete this.errorsByKeys[key];
         }
     }
   }
 
   finish(): ValidnoResult {
-    if (this.failed.length || this.errors.length) {
-        this.ok = false;
-    } else {
-        this.ok = true;
-    }
+    // Optimized: direct check
+    this.ok = this.errors.length === 0;
 
-    this.clearEmptyErrorsByKeys();
+    // Only clear if there are error keys (common case: no errors)
+    let hasEmptyKeys = false;
+    for (const key in this.errorsByKeys) {
+      if (this.errorsByKeys[key].length === 0) {
+        hasEmptyKeys = true;
+        break;
+      }
+    }
+    if (hasEmptyKeys) {
+      this.clearEmptyErrorsByKeys();
+    }
 
     return this;
   }

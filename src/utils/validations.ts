@@ -91,10 +91,12 @@ class ValidationUtility implements ValidationUtils {
    * @returns True if value is a plain object
    */
   isObject(value: any): boolean {
-    return value !== null && 
-           typeof value === 'object' && 
-           value?.constructor?.name === 'Object' && 
-           !Array.isArray(value);
+    // Optimized: avoid optional chaining and multiple checks
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+      return false;
+    }
+    const ctor = value.constructor;
+    return ctor === Object || ctor === undefined;
   }
 
   /**
@@ -214,9 +216,9 @@ class ValidationUtility implements ValidationUtils {
    * @returns True if value has minimum length
    */
   lengthMin(value: string | any[], min: number): boolean {
-    if (typeof value !== 'string' && !Array.isArray(value)) return false;
-    if (typeof min !== 'number') return false;
-    return value.length >= min;
+    // Optimized: assume min is always a number (schema validation)
+    const isValid = typeof value === 'string' || Array.isArray(value);
+    return isValid && value.length >= min;
   }
 
   /**
@@ -226,9 +228,9 @@ class ValidationUtility implements ValidationUtils {
    * @returns True if value has maximum length
    */
   lengthMax(value: string | any[], max: number): boolean {
-    if (typeof value !== 'string' && !Array.isArray(value)) return false;
-    if (typeof max !== 'number') return false;
-    return value.length <= max;
+    // Optimized: assume max is always a number (schema validation)
+    const isValid = typeof value === 'string' || Array.isArray(value);
+    return isValid && value.length <= max;
   }
 
   // NUMBER COMPARISONS

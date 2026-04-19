@@ -11,13 +11,15 @@ export interface FinalizeValidationInput {
 function finishValidation(checks: FinalizeValidationInput) {
     const {results, nestedKey, missedCheck, typeChecked, rulesChecked } = checks
 
-    if (missedCheck.length) results.setMissing(nestedKey);
+    const hasMissed = missedCheck.length > 0;
+    const hasTypeError = typeChecked.length > 0;
+    const hasRuleError = rulesChecked.length > 0;
 
-    const isPassed = !typeChecked.length && !rulesChecked.length && !missedCheck.length;
-
-    if (!isPassed) {
+    if (hasMissed) {
+      results.setMissing(nestedKey);
+    } else if (hasTypeError || hasRuleError) {
+      // Errors already added to errorsByKeys in validate methods, just mark as failed
       results.setFailed(nestedKey);
-      results.errorsByKeys[nestedKey] = [...results.errors];
     } else {
       results.setPassed(nestedKey);
     }

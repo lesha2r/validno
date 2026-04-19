@@ -34,7 +34,7 @@ const userSchema = new Schema({
   age: { type: Number, required: false, rules: { min: 18, max: 120 } }
 });
 
-assert('valid user passes', userSchema.validate({ name: 'Barney Stinson', email: 'barney@himym.com', age: 17 }).ok);
+assert('valid user passes', userSchema.validate({ name: 'Barney Stinson', email: 'barney@himym.com', age: 18 }).ok);
 assert('invalid email fails', !userSchema.validate({ name: 'Barney', email: 'not-an-email', age: 35 }).ok);
 assert('missing required name fails', !userSchema.validate({ email: 'b@b.com', age: 35 }).ok);
 

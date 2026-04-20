@@ -26,6 +26,11 @@ function validate(
         const [key, reqs] = schemaKeys[i]
         const keyResult = this.handleKey({key, data, reqs} as KeyValidationDetails)
         this.result.merge(keyResult)
+        
+        // ⚡ Fail fast: stop on first error if enabled
+        if (this.result.failFast && !keyResult.ok) {
+          return this.result.finish()
+        }
       }
     } else {
       // Slow path: selective validation
@@ -37,6 +42,11 @@ function validate(
         
         const keyResult = this.handleKey({key, data, reqs} as KeyValidationDetails)
         this.result.merge(keyResult)
+        
+        // ⚡ Fail fast: stop on first error if enabled
+        if (this.result.failFast && !keyResult.ok) {
+          return this.result.finish()
+        }
       }
     }
   

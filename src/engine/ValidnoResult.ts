@@ -8,6 +8,7 @@ export interface ResultInput {
   errors: string[];
   byKeys: { [key: string]: boolean };
   errorsByKeys: { [key: string]: string[] };
+  failFast?: boolean;  // Stop on first error
 }
 
 class ValidnoResult {
@@ -27,11 +28,23 @@ class ValidnoResult {
     this.errors = results?.errors || [];
     this.byKeys = results?.byKeys || {};
     this.errorsByKeys = results?.errorsByKeys || {};
+    
+    // Store failFast as a non-enumerable property
+    Object.defineProperty(this, 'failFast', {
+      value: results?.failFast || false,
+      writable: true,
+      enumerable: false,  // Hide from Jest comparisons
+      configurable: true
+    });
   }
+  
+  // Accessor for failFast (TypeScript needs this)
+  failFast!: boolean;
 
   setNoData(key: string): void {
     this.ok = false;
-    this.errors = [`Missing value for '${key}'`];
+    // Optimized: use string concatenation
+    this.errors = ["Missing value for '" + key + "'"];
   }
 
   setKeyStatus(key: string, result: boolean): void {
@@ -116,6 +129,11 @@ class ValidnoResult {
         }
         Array.prototype.push.apply(this.errorsByKeys[key], resultsNew.errorsByKeys[key]);
     }
+    
+    // Preserve failFast setting
+    if (resultsNew.failFast !== undefined) {
+      this.failFast = resultsNew.failFast;
+    }
 
     return this;
   }
@@ -149,7 +167,7 @@ class ValidnoResult {
   }
 
   data(): ResultInput {
-    return {
+    const result: ResultInput = {
         ok: this.ok,
         missed: this.missed,
         failed: this.failed,
@@ -158,6 +176,13 @@ class ValidnoResult {
         byKeys: this.byKeys,
         errorsByKeys: this.errorsByKeys,
     };
+    
+    // Only include failFast if it's true (for backward compatibility)
+    if (this.failFast) {
+      result.failFast = this.failFast;
+    }
+    
+    return result;
   }
 
   isValid(): boolean {

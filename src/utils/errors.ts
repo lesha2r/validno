@@ -11,7 +11,8 @@ class ErrorUtility implements ErrorUtils {
    * @returns Formatted error message
    */
   getMissingError(key: string = 'na'): string {
-    return `Missing value for '${key}'`;
+    // Optimized: use string concatenation (faster than template literals)
+    return "Missing value for '" + key + "'";
   }
 
   /**
@@ -29,7 +30,8 @@ class ErrorUtility implements ErrorUtils {
       return '';
     }
 
-    return `Check the type of '${key}': expected ${expectedOutput}, received ${receivedType}`;
+    // Optimized: use string concatenation
+    return "Check the type of '" + key + "': expected " + expectedOutput + ", received " + receivedType;
   }
 
   /**

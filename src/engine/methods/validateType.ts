@@ -57,9 +57,12 @@ const handleTypeValidation = (
   requirements: FieldSchema | SchemaDefinition,
   keyName = key
 ): TypeValidationResult[] => {
-  const reqs = { required: true, ...requirements } as FieldSchema;
+  // Optimized: avoid object spread, set required property directly if missing
+  const reqs = requirements as FieldSchema;
+  if (reqs.required === undefined) {
+    reqs.required = true;
+  }
 
-  const isNotNull = value !== null
   const keyTitle = 'title' in reqs && reqs.title !== undefined ? reqs.title : keyName
   const hasCustomMessage = reqs.customMessage && typeof reqs.customMessage === 'function'
 
@@ -86,8 +89,8 @@ const handleTypeValidation = (
       break
     }
     case Number: {
-      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
-      const isNumber = typeof value === 'number' || (isNotNull && value!.constructor === Number)
+      // Check for both primitive and wrapped numbers
+      const isNumber = typeof value === 'number' || (value !== null && value !== undefined && value.constructor === Number)
       if (isNumber) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       } else {
@@ -107,8 +110,8 @@ const handleTypeValidation = (
       break
     }
     case String: {
-      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
-      const isString = typeof value === 'string' || (isNotNull && value!.constructor === String)
+      // Check for both primitive and wrapped strings
+      const isString = typeof value === 'string' || (value !== null && value !== undefined && value.constructor === String)
       if (isString) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       } else {
@@ -128,7 +131,8 @@ const handleTypeValidation = (
       break
     }
     case Date: {
-      const isDate = isNotNull && value!.constructor === Date
+      // Optimized: inline date check
+      const isDate = value !== null && value !== undefined && value.constructor === Date
       const isValid = isDate && !isNaN((value as Date).getTime())
       if (isValid) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
@@ -149,8 +153,8 @@ const handleTypeValidation = (
       break
     }
     case Boolean: {
-      // Optimized: direct typeof check for primitives, constructor check for wrapped objects
-      const isBoolean = typeof value === 'boolean' || (isNotNull && value!.constructor === Boolean)
+      // Check for both primitive and wrapped booleans
+      const isBoolean = typeof value === 'boolean' || (value !== null && value !== undefined && value.constructor === Boolean)
       if (isBoolean) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       } else {
@@ -208,7 +212,8 @@ const handleTypeValidation = (
       break
     }
     case Object: {
-      const isObject = _validations.isObject(value) && value!.constructor === Object
+      // Optimized: inline object check (avoid function call)
+      const isObject = value !== null && typeof value === 'object' && !Array.isArray(value) && value.constructor === Object
       if (isObject) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       } else {
@@ -228,7 +233,8 @@ const handleTypeValidation = (
       break
     }
     case RegExp: {
-      const isRegex = _validations.isRegex(value)
+      // Optimized: inline regex check
+      const isRegex = value !== null && value !== undefined && value.constructor === RegExp
       if (isRegex) {
         result.push(_validateType.getResult(keyName, true, ValidationDetails.OK))
       } else {

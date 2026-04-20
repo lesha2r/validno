@@ -7,3 +7,4 @@ docs
 docs/**
 coverage
 dev.*s
+.*.dev.*s

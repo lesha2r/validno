@@ -84,44 +84,44 @@ const rulesFunctions: any = {
     is: (key: string, val: any, equalTo: any) => {
         return {
             result: _validations.is(val, equalTo),
-            details: `Value must be equal to "${equalTo}"`
+            details: "Value must be equal to \"" + equalTo + "\""
         }
     },
     isNot: (key: string, val: any, notEqualTo: any) => {
         return {
             result: _validations.isNot(val, notEqualTo),
-            details: `Value must not be equal to "${notEqualTo}"`
+            details: "Value must not be equal to \"" + notEqualTo + "\""
         }
     },
     min: (key: string, val: number, min: number) => {
         return {
             result: _validations.isNumberGte(val, min),
-            details: `Value must be greater than or equal to ${min}`
+            details: "Value must be greater than or equal to " + min
         }
     },
     max: (key: string, val: number, max: number) => {
         return {
             result: _validations.isNumberLte(val, max),
-            details: `Value must be less than or equal to ${max}`
+            details: "Value must be less than or equal to " + max
         }
     },
     minMax: (key: string, val: number, minMax: [min: number, max: number]) => {
         const [min, max] = minMax
         return {
             result: _validations.isNumberGte(val, min) && _validations.isNumberLte(val, max),
-            details: `Value must be between ${min} and ${max}`
+            details: "Value must be between " + min + " and " + max
         }
     },
     length: (key: string, val: TLengths, length: number) => {
         return {
             result: _validations.lengthIs(val, length),
-            details: `Value length must be equal to ${length} ${Array.isArray(val) ? 'items' : 'characters'}`
+            details: "Value length must be equal to " + length + " " + (Array.isArray(val) ? 'items' : 'characters')
         }
     },
     lengthNot: (key: string, val:  TLengths, lengthNot: number) => {
         return {
             result: _validations.lengthNot(val, lengthNot),
-            details: `Value must not be equal to ${lengthNot} ${Array.isArray(val) ? 'items' : 'characters'}`
+            details: "Value must not be equal to " + lengthNot + " " + (Array.isArray(val) ? 'items' : 'characters')
         }
     },
     lengthMinMax: (key: string, val:  TLengths, minMax: [min: number, max: number]) => {
@@ -129,7 +129,7 @@ const rulesFunctions: any = {
 
         return {
             result: _validations.lengthMin(val, min) && _validations.lengthMax(val, max),
-            details: `Value must be between ${min} and ${max} ${Array.isArray(val) ? 'items' : 'characters'}`
+            details: "Value must be between " + min + " and " + max + " " + (Array.isArray(val) ? 'items' : 'characters')
         }
     },
     lengthMin: (key: string, val:  TLengths, min: number) => {
@@ -137,7 +137,7 @@ const rulesFunctions: any = {
 
         return {
             result: _validations.lengthMin(val, min),
-            details: `Value must have at least ${min} ${Array.isArray(val) ? 'items' : 'characters'}`
+            details: "Value must have at least " + min + " " + (Array.isArray(val) ? 'items' : 'characters')
         }
     },
     lengthMax: (key: string, val:  TLengths, max: number) => {
@@ -145,13 +145,13 @@ const rulesFunctions: any = {
 
         return {
             result: _validations.lengthMax(val, max),
-            details: `Value must not exceed ${max} ${Array.isArray(val) ? 'items' : 'characters'}`
+            details: "Value must not exceed " + max + " " + (Array.isArray(val) ? 'items' : 'characters')
         }
     },
     regex: (key: string, val: any, regex: RegExp) => {
         return {
             result: _validations.regexTested(val, regex),
-            details: `Value must match the format ${regex}`
+            details: "Value must match the format " + regex
         }
     },
     enum: (key: string, value: any, allowedList: any[]) => {
@@ -163,14 +163,19 @@ const rulesFunctions: any = {
         if (!Array.isArray(value)) {
             const isCorrect = allowedList.includes(value)
             output.result = isCorrect,
-            output.details = isCorrect ? '' : `Value "${value}" is not allowed`
+            output.details = isCorrect ? '' : "Value \"" + value + "\" is not allowed"
         } else {
             const incorrectValues: any[] = []
-            value.forEach((v: any) => !allowedList.includes(v) ? incorrectValues.push(v): {})
+            // Optimized: use for loop instead of forEach
+            for (let i = 0; i < value.length; i++) {
+                if (!allowedList.includes(value[i])) {
+                    incorrectValues.push(value[i]);
+                }
+            }
             const isCorrect = incorrectValues.length === 0
 
             output.result = isCorrect,
-            output.details = isCorrect ? '' : `Values are not allowed: "${incorrectValues.join(', ')}"`
+            output.details = isCorrect ? '' : "Values are not allowed: \"" + incorrectValues.join(', ') + "\""
         }
 
         return output

@@ -12,7 +12,8 @@ function handleNestedKey(this: ValidateEngine, input: KeyValidationDetails) {
         data: data ? data[key] : undefined,
         // @ts-ignore
         reqs: reqs[itemKey],
-        nestedKey: `${nestedKey}.${itemKey}`
+        // Optimized: use string concatenation instead of template literal
+        nestedKey: nestedKey + "." + itemKey
       }
 
       const deepResults = this.handleKey(deepParams)

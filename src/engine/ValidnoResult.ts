@@ -1,7 +1,7 @@
 import _errors from "../utils/errors.js";
 
 export interface ResultInput {
-  ok: null | boolean;
+  ok: boolean;
   missed: string[];
   failed: string[];
   passed: string[];
@@ -12,7 +12,7 @@ export interface ResultInput {
 }
 
 class ValidnoResult {
-  ok: null | boolean;
+  ok: boolean;
   missed: string[];
   failed: string[];
   passed: string[];
@@ -21,7 +21,7 @@ class ValidnoResult {
   errorsByKeys: { [key: string]: string[] };
 
   constructor(results?: ResultInput) {
-    this.ok = results?.ok !== undefined ? results.ok : null;
+    this.ok = results?.ok !== undefined ? results.ok : false;
     this.missed = results?.missed || [];
     this.failed = results?.failed || [];
     this.passed = results?.passed || [];

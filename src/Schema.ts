@@ -29,7 +29,7 @@ export class Schema {
     ): ValidnoResult {
         // Reuse engine instance, just reset result with fail-fast option
         this._engine.result = new ValidnoResult({ 
-            ok: null, 
+            ok: false,
             missed: [], 
             failed: [], 
             passed: [], 
